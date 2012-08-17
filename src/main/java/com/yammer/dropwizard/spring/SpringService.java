@@ -8,15 +8,19 @@ import com.yammer.dropwizard.lifecycle.Managed;
 import com.yammer.dropwizard.logging.Log;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 import java.util.Map;
 
 /**
- * Service which automatically adds items to the service environment,
- * including health checks, resources.
+ * Service which load Spring Application context to automatically initialize Dropwizard {@link Environment}
+ * including health checks, resources, providers, tasks and managed.
+ * <p/>
  * <p/>
  * This code was inspired from  <a href="https://github.com/jaredstehler/dropwizard-guice">dropwizard-guice</a>.
  *
@@ -27,28 +31,58 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
 
     private static final Log LOG = Log.forClass(SpringService.class);
 
-    private ApplicationContext context;
-
-    protected SpringService(String name, ApplicationContext context) {
+    protected SpringService(String name) {
         super(name);
-        this.context = context;
     }
 
     @Override
     protected void initialize(T configuration, Environment environment) throws Exception {
+        // Initialize Dropwizard context
+        DropwizardContext parent = new DropwizardContext(configuration);
+        ConfigurableApplicationContext context = initializeSpring(configuration, parent);
+
+        // Check if the application context is active
+        if (!context.isActive())
+            context.refresh();
+
+        // Initialize Dropwizard environment
         addHealthChecks(environment, context);
         addProviders(environment, context);
         addInjectableProviders(environment, context);
         addResources(environment, context);
         addTasks(environment, context);
         addManaged(environment, context);
+        addLifecycle(environment, context);
     }
+
+    /**
+     * Initialization method for Spring application context.
+     * <p/>
+     * The parent context may be used to register Dropwizard {@link Configuration} as a Spring bean.
+     *
+     * @param configuration dropwizard configuration.
+     * @param parent        the dropwizard parent context
+     * @return the application context
+     * @throws Exception
+     */
+    protected abstract ConfigurableApplicationContext initializeSpring(T configuration, DropwizardContext parent) throws Exception;
+
+
+    // ~ Dropwizard Environment initialization methods
 
     private void addManaged(Environment environment, ApplicationContext context) {
         final Map<String, Managed> beansOfType = context.getBeansOfType(Managed.class);
         for (Managed managed : beansOfType.values()) {
             environment.manage(managed);
             LOG.info("Added managed: " + managed.getClass().getName());
+        }
+    }
+
+    private void addLifecycle(Environment environment, ApplicationContext context) {
+        Map<String, LifeCycle> beansOfType = context.getBeansOfType(LifeCycle.class);
+        for (LifeCycle lifeCycle : beansOfType.values()) {
+            environment.manage(lifeCycle);
+            LOG.info("Added lifeCycle: " + lifeCycle.getClass().getName());
         }
     }
 
@@ -67,7 +101,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             LOG.info("Added healthCheck: " + healthCheck.getClass().getName());
         }
     }
-
 
     private void addInjectableProviders(Environment environment, ApplicationContext context) {
         final Map<String, InjectableProvider> beansOfType = context.getBeansOfType(InjectableProvider.class);
@@ -90,7 +123,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
         for (Object resource : beansWithAnnotation.values()) {
             environment.addResource(resource);
             LOG.info("Added resource : " + resource.getClass().getName());
-
         }
     }
 

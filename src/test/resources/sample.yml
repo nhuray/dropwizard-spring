@@ -1,5 +1,0 @@
-# HTTP-specific options.
-http:
-
-  # The port on which the HTTP server listens for service requests.
-  port: 9898
