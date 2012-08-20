@@ -1,4 +1,4 @@
-package com.yammer.dropwizard.spring;
+package com.github.nhuray.dropwizard.spring;
 
 import com.yammer.dropwizard.config.Configuration;
 import org.springframework.context.support.StaticApplicationContext;
@@ -8,13 +8,12 @@ import org.springframework.context.support.StaticApplicationContext;
  * <p/>
  * The name of the Dropwizard {@link Configuration} bean is 'dw'.
  * <p/>
- *
  */
 public class DropwizardContext extends StaticApplicationContext {
 
     /**
-	 * Name of the Dropwizard {@link Configuration} bean in the factory.
-	 */
+     * Name of the Dropwizard {@link Configuration} bean in the factory.
+     */
     public static final String DROPWIZARD_CONFIGURATION = "dw";
 
     public DropwizardContext(Configuration configuration) {

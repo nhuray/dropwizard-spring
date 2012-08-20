@@ -1,17 +1,100 @@
-Dropwizard-Spring
-================
+Dropwizard/Spring
+===================================
 
-This project demonstrates a simple method for integrating Spring with Dropwizard.
-
-It was inspired by [Dropwizard Guice Extension](https://raw.github.com/jaredstehler/dropwizard-guice).
-
-### Usage
-
-It's simple to use; simple extend from SpringService<? extends Configuration> rather than Service, and create your Spring application context.
-
-Now you'll be able to use @Autowired (or @Inject) annotations throughout your project for dependency injection!
+Welcome to the Dropwizard/Spring project
 
 
-### Testing
+Introduction
+------------
 
-See the test classes located within src/test/java/com/yammer/dropwizard/spring/SpringServiceTest.java for an example.
+[Dropwizard](http://dropwizard.codahale.com) is a Java framework for developing ops-friendly, high-performance, RESTful web services.
+
+[Spring](http://www.springsource.org/spring-framework) is the most popular application development framework for enterprise Java™.
+
+This project provide a simple method for integrating Spring with Dropwizard.
+
+
+Versions
+------------
+
+The current version of the project is **1.0**.
+
+| dropwizard-spring  | Dropwizard   | Spring        |
+|:------------------:|:------------:|:-------------:|
+| master (1.0)       | 0.5.1        | 3.1.1.RELEASE |
+
+Installation
+------------
+
+
+To install Dropwizard/Spring you just have to add this Maven dependency in your project :
+
+```xml
+<dependency>
+     <groupId>com.github.nhuray</groupId>
+     <artifactId>dropwizard-spring</artifactId>
+     <version>1.0</version>
+</dependency>
+```
+
+Usage
+------------
+
+To use Dropwizard/Spring you just have to create a Dropwizard Service which extends ```SpringService``` rather than ```Service```, and create your Spring application context.
+
+For example :
+
+```java
+public class HelloApp extends SpringService<HelloAppConfiguration> {
+
+    private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
+
+    public static void main(String[] args) throws Exception {
+        new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
+    }
+
+    public HelloApp() {
+        super("hello-application");
+    }
+
+    @Override
+    protected ConfigurableApplicationContext initializeSpring(HelloAppConfiguration configuration, DropwizardContext parent) throws BeansException {
+        // Configuration based on annotation
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.setParent(parent);
+        context.scan("hello");
+        context.refresh();
+        return context;
+    }
+}
+```
+
+In this example the ```DropwizardContext``` is a Spring application context exposing the Dropwizard ```Configuration``` as a Spring Bean in order to use it in another Spring beans :
+
+```java
+@Path("/hello")
+@Component
+public class HelloResource {
+
+    @Autowired
+    private HelloService helloService;
+
+    @Value("#{dw.httpConfiguration.port}")
+    private Integer port;
+...
+
+```
+
+
+Testing
+------------
+
+To test Dropwizard/Spring you can checkout the project and run the hello project located in ```src/test/java/hello```.
+
+
+
+License
+------------
+
+    The Apache Software License, Version 2.0
+    http://www.apache.org/licenses/LICENSE-2.0.txt
