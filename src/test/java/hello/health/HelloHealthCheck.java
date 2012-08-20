@@ -1,13 +1,12 @@
-package sample.health;
+package hello.health;
 
 import com.yammer.metrics.core.HealthCheck;
 import org.springframework.stereotype.Component;
 
-@Component
-public class MyHealthCheck extends HealthCheck {
+public class HelloHealthCheck extends HealthCheck {
 
-	public MyHealthCheck() {
-		super("my-health");
+	public HelloHealthCheck() {
+		super("hello-health");
 	}
 	
 	@Override

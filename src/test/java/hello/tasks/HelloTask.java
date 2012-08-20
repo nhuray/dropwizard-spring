@@ -1,4 +1,4 @@
-package sample.tasks;
+package hello.tasks;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.yammer.dropwizard.tasks.Task;
@@ -6,11 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 
-@Component
-public class MyTask extends Task {
+public class HelloTask extends Task {
 
-	public MyTask() {
-		super("my-task");
+	public HelloTask() {
+		super("hello-task");
 	}
 	
 	@Override
