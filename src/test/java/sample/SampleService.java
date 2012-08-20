@@ -21,7 +21,7 @@ public class SampleService extends SpringService<SampleServiceConfiguration> {
     }
 
     @Override
-    protected ConfigurableApplicationContext initializeSpring(SampleServiceConfiguration configuration, DropwizardContext parent) throws Exception {
+    protected ConfigurableApplicationContext initializeSpring(SampleServiceConfiguration configuration, DropwizardContext parent) throws BeansException {
         // Configuration based on annotation
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
         context.setParent(parent);

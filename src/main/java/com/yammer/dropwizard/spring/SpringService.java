@@ -65,7 +65,7 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
      * @return the application context
      * @throws Exception
      */
-    protected abstract ConfigurableApplicationContext initializeSpring(T configuration, DropwizardContext parent) throws Exception;
+    protected abstract ConfigurableApplicationContext initializeSpring(T configuration, DropwizardContext parent) throws BeansException;
 
 
     // ~ Dropwizard Environment initialization methods
