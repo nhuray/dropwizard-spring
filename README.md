@@ -31,7 +31,7 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 
 ```xml
 <dependency>
-     <groupId>com.yammer.dropwizard.contrib</groupId>
+     <groupId>com.github.nhuray</groupId>
      <artifactId>dropwizard-spring</artifactId>
      <version>1.0</version>
 </dependency>
@@ -40,53 +40,56 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 Usage
 ------------
 
-To use DropWizard/Spring you just have to create a Dropwizard Service which extends ```SpringService``` rather than ```Service```, and create your Spring application context.
+To use Dropwizard/Spring you just have to create a Dropwizard Service which extends ```SpringService``` rather than ```Service```, and create your Spring application context.
 
 For example :
 
 ```java
-public class SampleService extends SpringService<SampleServiceConfiguration> {
+public class HelloApp extends SpringService<HelloAppConfiguration> {
 
-private static final String CONFIGURATION_FILE = "src/test/resources/sample/sample.yml";
+    private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 
-public static void main(String[] args) throws Exception {
-    new SampleService().run(new String[]{"server", CONFIGURATION_FILE});
-}
+    public static void main(String[] args) throws Exception {
+        new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
+    }
 
-public SampleService() {
-    super("sample-application");
-}
+    public HelloApp() {
+        super("hello-application");
+    }
 
-@Override
-protected ConfigurableApplicationContext initializeSpring(SampleServiceConfiguration configuration, DropwizardContext parent) throws BeansException {
-    // Configuration based on annotation
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-    context.setParent(parent);
-    context.scan("sample");
-    context.refresh();
-    return context;
+    @Override
+    protected ConfigurableApplicationContext initializeSpring(HelloAppConfiguration configuration, DropwizardContext parent) throws BeansException {
+        // Configuration based on annotation
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.setParent(parent);
+        context.scan("hello");
+        context.refresh();
+        return context;
+    }
 }
 ```
 
 In this example the ```DropwizardContext``` is a Spring application context exposing the Dropwizard ```Configuration``` as a Spring Bean in order to use it in another Spring beans :
 
 ```java
-@Path("my-resource")
+@Path("/hello")
 @Component
-public class MyResource {
+public class HelloResource {
+
+    @Autowired
+    private HelloService helloService;
 
     @Value("#{dw.http}")
     private HttpConfiguration http;
-
 ...
-```
 
+```
 
 
 Testing
 ------------
 
-To test Dropwizard/Spring you can checkout the project and run the sample project located in ```src/test/java/sample``.
+To test Dropwizard/Spring you can checkout the project and run the hello project located in ```src/test/java/hello```.
 
 
 License

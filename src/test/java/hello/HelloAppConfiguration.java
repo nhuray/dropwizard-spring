@@ -1,17 +1,17 @@
-package sample;
+package hello;
 
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.HttpConfiguration;
 import com.yammer.dropwizard.config.LoggingConfiguration;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class SampleServiceConfiguration extends Configuration {
+public class HelloAppConfiguration extends Configuration {
 
 	@JsonProperty
-	private SampleConfiguration sample;
+	private HelloConfiguration hello;
 	
-	public SampleConfiguration getSample() {
-		return sample;
+	public HelloConfiguration getHello() {
+		return hello;
 	}
 
     public HttpConfiguration getHttp(){

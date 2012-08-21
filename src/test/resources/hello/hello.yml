@@ -1,0 +1,11 @@
+# HTTP-specific options.
+http:
+
+  # The port on which the HTTP server listens for service requests.
+  port: 9898
+
+
+hello:
+
+  # The hello message to display at http://localhost:9898/hello
+  message: Welcome to the hello application !!!

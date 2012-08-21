@@ -1,4 +1,4 @@
-package com.yammer.dropwizard.spring;
+package com.github.nhuray.dropwizard.spring;
 
 import com.yammer.dropwizard.config.Configuration;
 import org.springframework.context.support.StaticApplicationContext;

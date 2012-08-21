@@ -1,4 +1,4 @@
-package com.yammer.dropwizard.spring;
+package com.github.nhuray.dropwizard.spring;
 
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.yammer.dropwizard.Service;
