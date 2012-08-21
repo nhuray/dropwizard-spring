@@ -1,0 +1,13 @@
+# HTTP-specific options.
+http:
+
+  # The port on which the HTTP server listens for service requests.
+  port: 9898
+
+
+hello:
+
+  # The hello messages to display at http://localhost:9898/my-resource
+  messages:
+    - Welcome to the hello application !!!
+    - It's a really cool application to test integration between Dropwizard and Spring

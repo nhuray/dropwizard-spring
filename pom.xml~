@@ -112,7 +112,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
             </plugin>
-	    <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -126,7 +125,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 

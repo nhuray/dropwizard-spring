@@ -47,14 +47,14 @@ For example :
 ```java
 public class SampleService extends SpringService<SampleServiceConfiguration> {
 
-private static final String CONFIGURATION_FILE = "src/test/resources/sample/sample.yml";
+private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 
 public static void main(String[] args) throws Exception {
     new SampleService().run(new String[]{"server", CONFIGURATION_FILE});
 }
 
 public SampleService() {
-    super("sample-application");
+    super("hello-application");
 }
 
 @Override
@@ -62,7 +62,7 @@ protected ConfigurableApplicationContext initializeSpring(SampleServiceConfigura
     // Configuration based on annotation
     AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
     context.setParent(parent);
-    context.scan("sample");
+    context.scan("hello");
     context.refresh();
     return context;
 }
@@ -86,7 +86,7 @@ public class MyResource {
 Testing
 ------------
 
-To test Dropwizard/Spring you can checkout the project and run the sample project located in ```src/test/java/sample``.
+To test Dropwizard/Spring you can checkout the project and run the hello project located in ```src/test/java/hello``.
 
 
 License
