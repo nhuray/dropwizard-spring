@@ -1,15 +1,33 @@
 package hello;
 
+import hello.health.HelloHealthCheck;
+import hello.service.HelloService;
+import hello.tasks.HelloTask;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
+@Configuration
 public class HelloConfiguration {
 
     @JsonProperty
     private String message;
 
-    public String getMessage() {
-        return message;
+    @Bean
+    public HelloService helloService() {
+        return new HelloService(message);
     }
+
+    @Bean
+    public HelloTask helloTask() {
+        return new HelloTask();
+    }
+
+    @Bean
+    public HelloHealthCheck helloHealthCheck() {
+        return new HelloHealthCheck();
+    }
+
+
+
 }

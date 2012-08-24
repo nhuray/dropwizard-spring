@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 
-@Component
 public class HelloTask extends Task {
 
 	public HelloTask() {

@@ -1,6 +1,7 @@
 package com.github.nhuray.dropwizard.spring;
 
 import com.yammer.dropwizard.config.Configuration;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
 
 /**
@@ -10,7 +11,7 @@ import org.springframework.context.support.StaticApplicationContext;
  * <p/>
  *
  */
-public class DropwizardContext extends StaticApplicationContext {
+public class DropwizardContext extends AnnotationConfigApplicationContext {
 
     /**
 	 * Name of the Dropwizard {@link Configuration} bean in the factory.
@@ -21,5 +22,7 @@ public class DropwizardContext extends StaticApplicationContext {
         // Register dropwizard configuration
         getBeanFactory().registerSingleton(DROPWIZARD_CONFIGURATION, configuration);
         refresh();
+
+
     }
 }

@@ -3,7 +3,6 @@ package hello.health;
 import com.yammer.metrics.core.HealthCheck;
 import org.springframework.stereotype.Component;
 
-@Component
 public class HelloHealthCheck extends HealthCheck {
 
 	public HelloHealthCheck() {

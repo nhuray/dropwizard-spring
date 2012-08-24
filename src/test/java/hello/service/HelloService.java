@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public class HelloService {
 
-    @Value("#{dw.hello.message}")
     private String message;
+
+    public HelloService(String message) {
+        this.message = message;
+    }
 
     public String greeting() {
         return message;
