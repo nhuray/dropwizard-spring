@@ -23,6 +23,7 @@ The current version of the project is **0.1**.
 |:------------------:|:------------:|:-------------:|
 | master (0.1)       | 0.5.1        | 3.1.1.RELEASE |
 
+
 Installation
 ------------
 
@@ -33,7 +34,7 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 <dependency>
      <groupId>com.github.nhuray</groupId>
      <artifactId>dropwizard-spring</artifactId>
-     <version>1.0</version>
+     <version>0.1</version>
 </dependency>
 ```
 
