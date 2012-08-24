@@ -3,6 +3,7 @@ package hello.config;
 import hello.health.HelloHealthCheck;
 import hello.service.HelloService;
 import hello.tasks.HelloTask;
+import lombok.Getter;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class HelloConfiguration {
 
     @Value("#{dw.hello.message}")
-    private String message;
+    private @Getter String message;
 
     @Bean
     public HelloService helloService() {
@@ -29,7 +30,4 @@ public class HelloConfiguration {
         return new HelloHealthCheck();
     }
 
-    public String getMessage() {
-        return message;
-    }
 }

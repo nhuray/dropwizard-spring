@@ -1,6 +1,8 @@
 package hello.config;
 
 import com.yammer.dropwizard.config.Configuration;
+import lombok.Data;
+import lombok.Getter;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,10 +11,6 @@ import org.springframework.stereotype.Component;
 public class HelloAppConfiguration extends Configuration {
 
     @Autowired
-	private HelloConfiguration hello;
-
-    public HelloConfiguration getHello() {
-        return hello;
-    }
+	private @Getter HelloConfiguration hello;
 
 }
