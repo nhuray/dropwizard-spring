@@ -5,8 +5,8 @@ import com.yammer.dropwizard.config.HttpConfiguration;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import hello.HelloApp;
-import hello.HelloAppConfiguration;
-import hello.HelloConfiguration;
+import hello.config.HelloAppConfiguration;
+import hello.config.HelloConfiguration;
 import hello.health.HelloHealthCheck;
 import hello.resources.HelloResource;
 import hello.service.HelloService;
@@ -38,9 +38,9 @@ public class SpringServiceTest {
 
         final HelloConfiguration helloConfiguration = mock(HelloConfiguration.class);
         when(configuration.getHello()).thenReturn(helloConfiguration);
-//        when(helloConfiguration.getMessage()).thenReturn("Hello");
+        when(helloConfiguration.getMessage()).thenReturn("Hello");
         final HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
-        when(configuration.getHttp()).thenReturn(httpConfiguration);
+        when(configuration.getHttpConfiguration()).thenReturn(httpConfiguration);
         when(httpConfiguration.getPort()).thenReturn(1111);
     }
 
@@ -83,7 +83,7 @@ public class SpringServiceTest {
         verify(environment).addResource(resource.capture());
 
         HelloResource r = resource.getValue();
-//        assertThat(r.getPort(), is(1111));
+        assertThat(r.getPort(), is(1111));
     }
 
     @Test
