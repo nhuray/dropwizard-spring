@@ -17,10 +17,10 @@ public class HelloResource {
     @Autowired
     private HelloService helloService;
 
-    @Value("#{dw.httpConfiguration.port}")   // Get from dw bean
+    @Value("${dw.http.port}")
     private Integer port;
 
-    @Value("${pouet.httpConfiguration.connectorType:not specified}") // Get from yaml file
+    @Value("${dw.http.connectorType}")
     private String connectorType;
 
     @GET

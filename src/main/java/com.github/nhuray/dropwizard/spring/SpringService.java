@@ -38,12 +38,7 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
     @Override
     protected void initialize(T configuration, Environment environment) throws Exception {
         // Initialize Dropwizard context
-        DropwizardContext parent = new DropwizardContext(configuration);
-        ConfigurableApplicationContext context = initializeSpring(configuration, parent);
-
-        // Check if the application context is active
-        if (!context.isActive())
-            context.refresh();
+        ApplicationContext context = initializeApplicationContext(configuration);
 
         // Initialize Dropwizard environment
         addHealthChecks(environment, context);
@@ -56,16 +51,15 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
     }
 
     /**
-     * Initialization method for Spring application context.
+     * Initialization method for a Spring {@link ApplicationContext}.
      * <p/>
-     * The parent context may be used to register Dropwizard {@link Configuration} as a Spring bean.
+     *
      *
      * @param configuration dropwizard configuration.
-     * @param parent        the dropwizard parent context
      * @return the application context
      * @throws BeansException if context creation failed
      */
-    protected abstract ConfigurableApplicationContext initializeSpring(T configuration, DropwizardContext parent) throws BeansException;
+    protected abstract ApplicationContext initializeApplicationContext(T configuration) throws BeansException;
 
 
     // ~ Dropwizard Environment initialization methods

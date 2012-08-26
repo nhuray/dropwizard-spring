@@ -1,8 +1,8 @@
 package com.github.nhuray.dropwizard.spring.config;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.StringUtils;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.util.Collection;
@@ -58,17 +58,16 @@ import java.util.Properties;
  *
  * @author Dave Syer
  */
-public class YamlPropertiesPersister extends DefaultPropertiesPersister {
+public class JsonPropertiesPersister extends DefaultPropertiesPersister {
 
+    private ObjectMapper mapper;
 
-    private String prefix;
-
-    public YamlPropertiesPersister() {
-        this("");
+    public JsonPropertiesPersister() {
+        this(new ObjectMapper());
     }
 
-    public YamlPropertiesPersister(String prefix) {
-        this.prefix = prefix;
+    public JsonPropertiesPersister(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
 
     @Override
@@ -87,8 +86,7 @@ public class YamlPropertiesPersister extends DefaultPropertiesPersister {
      */
     @Override
     public void load(Properties props, Reader reader) throws IOException {
-        Yaml yaml = new Yaml();
-        Map<String, Object> map = (Map<String, Object>) yaml.load(reader);
+        Map map = mapper.readValue(reader, Map.class);
         // now we can populate supplied props
         assignProperties(props, map, null);
     }
@@ -105,7 +103,7 @@ public class YamlPropertiesPersister extends DefaultPropertiesPersister {
             }
             Object value = entry.getValue();
             if (value instanceof String) {
-                properties.put(prefix + key, value);
+                properties.put(key, value);
             } else if (value instanceof Map) {
                 // Need a compound key
                 @SuppressWarnings("unchecked")
@@ -115,25 +113,25 @@ public class YamlPropertiesPersister extends DefaultPropertiesPersister {
                 // Need a compound key
                 @SuppressWarnings("unchecked")
                 Collection<Object> collection = (Collection<Object>) value;
-                properties.put(prefix + key, StringUtils.collectionToCommaDelimitedString(collection));
+                properties.put(key, StringUtils.collectionToCommaDelimitedString(collection));
                 int count = 0;
                 for (Object object : collection) {
                     assignProperties(properties, Collections.singletonMap("[" + (count++) + "]", object), key);
                 }
             } else {
-                properties.put(prefix + key, value == null ? "" : String.valueOf(value));
+                properties.put(key, value == null ? "" : String.valueOf(value));
             }
         }
     }
 
     @Override
     public void store(Properties props, OutputStream os, String header) throws IOException {
-        throw new UnsupportedOperationException("YamlPropertiesPersister is just read-only");
+        throw new UnsupportedOperationException("JsonPropertiesPersister is just read-only");
     }
 
     @Override
     public void store(Properties props, Writer writer, String header) throws IOException {
-        throw new UnsupportedOperationException("YamlPropertiesPersister is just read-only");
+        throw new UnsupportedOperationException("JsonPropertiesPersister is just read-only");
     }
 
 }

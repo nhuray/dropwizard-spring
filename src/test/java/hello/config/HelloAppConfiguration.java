@@ -9,10 +9,14 @@ import org.springframework.stereotype.Component;
 public class HelloAppConfiguration extends Configuration {
 
     @Autowired
+    @JsonProperty
 	private HelloConfiguration hello;
 
     public HelloConfiguration getHello() {
         return hello;
     }
 
+    public void setHello(HelloConfiguration hello) {
+        this.hello = hello;
+    }
 }

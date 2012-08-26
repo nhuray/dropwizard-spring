@@ -1,10 +1,11 @@
 package hello;
 
 
-import com.github.nhuray.dropwizard.spring.DropwizardContext;
 import com.github.nhuray.dropwizard.spring.SpringService;
+import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import hello.config.HelloAppConfiguration;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -21,10 +22,23 @@ public class HelloApp extends SpringService<HelloAppConfiguration> {
     }
 
     @Override
-    protected ConfigurableApplicationContext initializeSpring(HelloAppConfiguration configuration, DropwizardContext parent) throws BeansException {
+    protected ConfigurableApplicationContext initializeApplicationContext(HelloAppConfiguration configuration) throws BeansException {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.setParent(parent);
         context.scan("hello");
+
+        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+        // Register ConfigurationPlaceholderConfigurer
+        ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
+        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(true);
+        placeholderConfigurer.setPlaceholderPrefix("${dw.");
+        placeholderConfigurer.setPlaceholderSuffix("}");
+        beanFactory.registerSingleton("placeholderConfigurer", placeholderConfigurer);
+
+        // Register Configuration
+        beanFactory.registerSingleton("dw", configuration);
+
+        // Refresh
         context.refresh();
         return context;
     }

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.*;
 
 public class SpringServiceTest {
 
-    @Mock
     private HelloAppConfiguration configuration;
 
     @Mock
@@ -36,12 +35,11 @@ public class SpringServiceTest {
     public void initMocks() {
         MockitoAnnotations.initMocks(this);
 
-        final HelloConfiguration helloConfiguration = mock(HelloConfiguration.class);
-        when(configuration.getHello()).thenReturn(helloConfiguration);
-        when(helloConfiguration.getMessage()).thenReturn("Hello");
-        final HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
-        when(configuration.getHttpConfiguration()).thenReturn(httpConfiguration);
-        when(httpConfiguration.getPort()).thenReturn(1111);
+        HelloConfiguration hello = new HelloConfiguration();
+        hello.setMessage("Hello");
+
+        configuration = new HelloAppConfiguration();
+        configuration.setHello(hello);
     }
 
     @Test
@@ -83,7 +81,7 @@ public class SpringServiceTest {
         verify(environment).addResource(resource.capture());
 
         HelloResource r = resource.getValue();
-        assertThat(r.getPort(), is(1111));
+        assertThat(r.getPort(), is(8080)); // Defaut port
     }
 
     @Test
