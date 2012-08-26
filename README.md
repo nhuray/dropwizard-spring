@@ -59,39 +59,36 @@ public class HelloApp extends SpringService<HelloAppConfiguration> {
     }
 
     @Override
-    protected ConfigurableApplicationContext initializeSpring(HelloAppConfiguration configuration, DropwizardContext parent) throws BeansException {
-        // Configuration based on annotation
+    protected ConfigurableApplicationContext initializeApplicationContext(HelloAppConfiguration configuration, Environment environment) throws BeansException {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.setParent(parent);
         context.scan("hello");
+
+        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+        // Register ConfigurationPlaceholderConfigurer
+        ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
+        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(false); // To test all placeholders are resolved
+        placeholderConfigurer.setPlaceholderPrefix("${dw.");
+        placeholderConfigurer.setPlaceholderSuffix("}");
+        beanFactory.registerSingleton("placeholderConfigurer", placeholderConfigurer);
+
+        // Register Configuration
+        beanFactory.registerSingleton("dw", configuration);
+
+        // Refresh
         context.refresh();
         return context;
     }
 }
 ```
 
-In this example the ```DropwizardContext``` is a Spring application context exposing the Dropwizard ```Configuration``` as a Spring Bean in order to use it in another Spring beans :
+In this example we create a Spring application context based on annotation to resolve Spring beans.
 
-```java
-@Path("/hello")
-@Component
-public class HelloResource {
+Moreover we register a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${http.port}```.
 
-    @Autowired
-    private HelloService helloService;
+Finally, we register the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with this SPEL (For example : ```#{dw.httpConfiguration}```).
 
-    @Value("#{dw.httpConfiguration.port}")
-    private Integer port;
-...
-
-```
-
-
-Testing
-------------
-
-To test Dropwizard/Spring you can checkout the project and run the hello project located in ```src/test/java/hello```.
-
+Please take a look at the hello application located in ```src/test/java/hello```.
 
 
 License
