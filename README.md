@@ -84,9 +84,9 @@ public class HelloApp extends SpringService<HelloAppConfiguration> {
 
 In this example we create a Spring application context based on annotation to resolve Spring beans.
 
-Moreover we register a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${http.port}```.
+Moreover we register a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${dw.http.port}```.
 
-Finally, we register the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with this SPEL (For example : ```#{dw.httpConfiguration}```).
+Finally, we register the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with [Spring Exression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
 
 Please take a look at the hello application located in ```src/test/java/hello```.
 
