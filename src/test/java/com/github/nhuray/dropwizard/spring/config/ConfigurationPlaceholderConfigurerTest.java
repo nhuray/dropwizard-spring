@@ -15,7 +15,7 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
 /**
  * Tests for {@link ConfigurationPlaceholderConfigurer}
  * <p/>
- * Adapted from <a href="https://github.com/SpringSource/spring-framework/blob/master/spring-beans/src/test/java/org/springframework/beans/factory/config/PropertyPlaceholderConfigurerTests.java" >PropertyPlaceholderConfigurerTests</a>
+ * Adapted from <a href="https://com.com/SpringSource/spring-framework/blob/master/spring-beans/src/test/java/org/springframework/beans/factory/config/PropertyPlaceholderConfigurerTests.java" >PropertyPlaceholderConfigurerTests</a>
  */
 public class ConfigurationPlaceholderConfigurerTest {
 

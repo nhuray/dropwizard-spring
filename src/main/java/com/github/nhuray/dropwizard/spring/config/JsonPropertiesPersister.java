@@ -11,50 +11,9 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * {@link org.springframework.util.PropertiesPersister} that reads from a YAML source.
+ * {@link org.springframework.util.PropertiesPersister} that reads from a JSON source.
  * <p/>
- * YAML is a nice human-readable format for configuration,
- * and it has some useful hierarchical properties. It's more or less a superset of JSON, so it has a lot of similar
- * features. The Properties created by this factory have nested paths for hierarchical objects, so for instance this
- * YAML
- * <p/>
- * <pre>
- * environments:
- *   dev:
- *     url: http://dev.bar.com
- *     name: Developer Setup
- *   prod:
- *     url: http://foo.bar.com
- *     name: My Cool App
- * </pre>
- * <p/>
- * is transformed into these Properties:
- * <p/>
- * <pre>
- * environments.dev.url=http://dev.bar.com
- * environments.dev.name=Developer Setup
- * environments.prod.url=http://foo.bar.com
- * environments.prod.name=My Cool App
- * </pre>
- * <p/>
- * Lists are represented as comma-separated values (useful for simple String values) and also as property keys with
- * <code>[]</code> dereferencers, for example this YAML:
- * <p/>
- * <pre>
- * servers:
- * - dev.bar.com
- * - foo.bar.com
- * </pre>
- * <p/>
- * becomes java Properties like this:
- * <p/>
- * <pre>
- * servers=dev.bar.com,foo.bar.com
- * servers[0]=dev.bar.com
- * servers[1]=foo.bar.com
- * </pre>
- * <p/>
- * This code was inspired from  <a href="https://gist.github.com/2051955">Dave Syer YamlPropertiesFactoryBean</a>.
+ * This code was inspired from  <a href="https://gist.com.com/2051955">Dave Syer YamlPropertiesFactoryBean</a>.
  *
  * @author Dave Syer
  */

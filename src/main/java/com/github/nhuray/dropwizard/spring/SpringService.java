@@ -24,7 +24,7 @@ import java.util.Map;
  * including health checks, resources, providers, tasks and managed.
  * <p/>
  * <p/>
- * This code was inspired from  <a href="https://github.com/jaredstehler/dropwizard-guice">dropwizard-guice</a>.
+ * This code was inspired from  <a href="https://com.com/jaredstehler/dropwizard-guice">dropwizard-guice</a>.
  *
  * @author jstehler
  * @author nhuray

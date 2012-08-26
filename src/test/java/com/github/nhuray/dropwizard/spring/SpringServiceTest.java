@@ -1,7 +1,6 @@
 package com.github.nhuray.dropwizard.spring;
 
 import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.config.HttpConfiguration;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import hello.HelloApp;
