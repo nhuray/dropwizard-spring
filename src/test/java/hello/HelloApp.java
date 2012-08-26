@@ -31,7 +31,7 @@ public class HelloApp extends SpringService<HelloAppConfiguration> {
 
         // Register ConfigurationPlaceholderConfigurer
         ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
-        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(true);
+        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(false); // To test all placeholders are resolved
         placeholderConfigurer.setPlaceholderPrefix("${dw.");
         placeholderConfigurer.setPlaceholderSuffix("}");
         beanFactory.registerSingleton("placeholderConfigurer", placeholderConfigurer);
