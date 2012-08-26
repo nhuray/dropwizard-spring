@@ -3,6 +3,7 @@ package hello;
 
 import com.github.nhuray.dropwizard.spring.SpringService;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
+import com.yammer.dropwizard.config.Environment;
 import hello.config.HelloAppConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -22,7 +23,7 @@ public class HelloApp extends SpringService<HelloAppConfiguration> {
     }
 
     @Override
-    protected ConfigurableApplicationContext initializeApplicationContext(HelloAppConfiguration configuration) throws BeansException {
+    protected ConfigurableApplicationContext initializeApplicationContext(HelloAppConfiguration configuration, Environment environment) throws BeansException {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
         context.scan("hello");
 

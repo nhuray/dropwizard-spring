@@ -10,6 +10,8 @@ import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -37,8 +39,8 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
 
     @Override
     protected void initialize(T configuration, Environment environment) throws Exception {
-        // Initialize Dropwizard context
-        ApplicationContext context = initializeApplicationContext(configuration);
+        // User initilization of Spring Application context
+        ConfigurableApplicationContext context = initializeApplicationContext(configuration, environment);
 
         // Initialize Dropwizard environment
         addHealthChecks(environment, context);
@@ -54,70 +56,105 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
      * Initialization method for a Spring {@link ApplicationContext}.
      * <p/>
      *
-     *
-     * @param configuration dropwizard configuration.
+     * @param configuration dropwizard configuration
+     * @param environment   dropwizard environment
      * @return the application context
      * @throws BeansException if context creation failed
      */
-    protected abstract ApplicationContext initializeApplicationContext(T configuration) throws BeansException;
+    protected abstract ConfigurableApplicationContext initializeApplicationContext(T configuration, Environment environment) throws BeansException;
 
 
     // ~ Dropwizard Environment initialization methods
 
-    private void addManaged(Environment environment, ApplicationContext context) {
+    private void addManaged(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, Managed> beansOfType = context.getBeansOfType(Managed.class);
-        for (Managed managed : beansOfType.values()) {
+        for (String beanName : beansOfType.keySet()) {
+            // Add managed to Dropwizard environment
+            Managed managed = beansOfType.get(beanName);
             environment.manage(managed);
             LOG.info("Added managed: " + managed.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addLifecycle(Environment environment, ApplicationContext context) {
+    private void addLifecycle(Environment environment, ConfigurableApplicationContext context) {
         Map<String, LifeCycle> beansOfType = context.getBeansOfType(LifeCycle.class);
-        for (LifeCycle lifeCycle : beansOfType.values()) {
+        for (String beanName : beansOfType.keySet()) {
+            // Add lifeCycle to Dropwizard environment
+            LifeCycle lifeCycle = beansOfType.get(beanName);
             environment.manage(lifeCycle);
             LOG.info("Added lifeCycle: " + lifeCycle.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addTasks(Environment environment, ApplicationContext context) {
+    private void addTasks(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, Task> beansOfType = context.getBeansOfType(Task.class);
-        for (Task task : beansOfType.values()) {
+        for (String beanName : beansOfType.keySet()) {
+            // Add task to Dropwizard environment
+            Task task = beansOfType.get(beanName);
             environment.addTask(task);
             LOG.info("Added task: " + task.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addHealthChecks(Environment environment, ApplicationContext context) {
+    private void addHealthChecks(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, HealthCheck> beansOfType = context.getBeansOfType(HealthCheck.class);
-        for (HealthCheck healthCheck : beansOfType.values()) {
+        for (String beanName : beansOfType.keySet()) {
+            // Add healthCheck to Dropwizard environment
+            HealthCheck healthCheck = beansOfType.get(beanName);
             environment.addHealthCheck(healthCheck);
             LOG.info("Added healthCheck: " + healthCheck.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addInjectableProviders(Environment environment, ApplicationContext context) {
+    private void addInjectableProviders(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, InjectableProvider> beansOfType = context.getBeansOfType(InjectableProvider.class);
-        for (InjectableProvider injectableProvider : beansOfType.values()) {
+        for (String beanName : beansOfType.keySet()) {
+            // Add injectableProvider to Dropwizard environment
+            InjectableProvider injectableProvider = beansOfType.get(beanName);
             environment.addProvider(injectableProvider);
             LOG.info("Added injectable provider: " + injectableProvider.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addProviders(Environment environment, ApplicationContext context) {
+    private void addProviders(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(Provider.class);
-        for (Object provider : beansWithAnnotation.values()) {
+        for (String beanName : beansWithAnnotation.keySet()) {
+            // Add injectableProvider to Dropwizard environment
+            Object provider = beansWithAnnotation.get(beanName);
             environment.addProvider(provider);
             LOG.info("Added provider : " + provider.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void addResources(Environment environment, ApplicationContext context) {
+    private void addResources(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, Object> beansWithAnnotation = context.getBeansWithAnnotation(Path.class);
-        for (Object resource : beansWithAnnotation.values()) {
+        for (String beanName : beansWithAnnotation.keySet()) {
+            // Add injectableProvider to Dropwizard environment
+            Object resource = beansWithAnnotation.get(beanName);
             environment.addResource(resource);
             LOG.info("Added resource : " + resource.getClass().getName());
+            // Remove from Spring application context
+            removeBeanDefinition(context, beanName);
         }
+    }
+
+    private void removeBeanDefinition(ConfigurableApplicationContext context, String beanName) {
+        ConfigurableListableBeanFactory configurableListableBeanFactory = context.getBeanFactory();
+        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) configurableListableBeanFactory;
+        // Removing the bean from container
+        beanDefinitionRegistry.removeBeanDefinition(beanName);
     }
 
 }
