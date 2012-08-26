@@ -17,12 +17,15 @@ public class HelloResource {
     @Autowired
     private HelloService helloService;
 
-    @Value("#{dw.httpConfiguration.port}")
+    @Value("#{dw.httpConfiguration.port}")   // Get from dw bean
     private Integer port;
+
+    @Value("${pouet.httpConfiguration.connectorType:not specified}") // Get from yaml file
+    private String connectorType;
 
     @GET
     public Response doGet() {
-        return Response.ok(String.format("%s<br/>Hello application is running on port : %d", helloService.greeting(), port)).build();
+        return Response.ok(String.format("%s<br/>Hello application is running on port : %d; connectortType : %s", helloService.greeting(), port, connectorType)).build();
     }
 
     public HelloService getHelloService() {
