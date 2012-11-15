@@ -54,6 +54,7 @@
             <groupId>com.yammer.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
