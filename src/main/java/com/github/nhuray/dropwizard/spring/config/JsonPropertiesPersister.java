@@ -1,6 +1,6 @@
 package com.github.nhuray.dropwizard.spring.config;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.DefaultPropertiesPersister;
 import org.springframework.util.StringUtils;
 

@@ -2,7 +2,6 @@ package hello.tasks;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.yammer.dropwizard.tasks.Task;
-import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 

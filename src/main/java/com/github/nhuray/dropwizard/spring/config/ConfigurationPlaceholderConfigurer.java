@@ -1,9 +1,13 @@
 package com.github.nhuray.dropwizard.spring.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.dropwizard.config.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -21,18 +25,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import static org.codehaus.jackson.annotate.JsonAutoDetect.Visibility.NONE;
-import static org.codehaus.jackson.annotate.JsonMethod.GETTER;
-
 /**
- *
+ * {@link org.springframework.beans.factory.config.PlaceholderConfigurerSupport} subclass that resolves ${...} placeholders
+ * against the Dropwizard {@link Configuration}..
  */
 public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProcessor {
 
     /** Logger available to subclasses */
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger LOG = LoggerFactory.getLogger(ConfigurationPlaceholderConfigurer.class);
 
     private Configuration configuration;
+
     private ObjectMapper mapper;
 
     // ~ Copied from {@link PlaceholderConfigurerSupport} ----------------------------------------------------------------------
@@ -62,15 +65,14 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
     private PropertiesPersister propertiesPersister ;
 
 
+
     public ConfigurationPlaceholderConfigurer(Configuration configuration) {
         this.configuration = configuration;
 
         // Initialize ObjectMapper
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(GETTER, NONE);     // Only Serialize fields
-
+        mapper = new ObjectMapper();
+        mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);     // Only Serialize fields
         this.propertiesPersister = new JsonPropertiesPersister(mapper);
-        this.mapper = mapper;
     }
 
 

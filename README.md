@@ -21,7 +21,8 @@ The current version of the project is **0.1**.
 
 | dropwizard-spring  | Dropwizard   | Spring        |
 |:------------------:|:------------:|:-------------:|
-| master (0.1)       | 0.5.1        | 3.1.1.RELEASE |
+| master (0.2)       | 0.6.0        | 3.1.3.RELEASE |
+| 0.1                | 0.5.1        | 3.1.1.RELEASE |
 
 
 Installation
@@ -34,59 +35,51 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 <dependency>
      <groupId>com.github.nhuray</groupId>
      <artifactId>dropwizard-spring</artifactId>
-     <version>0.1</version>
+     <version>0.2</version>
 </dependency>
 ```
 
 Usage
 ------------
 
-To use Dropwizard/Spring you just have to create a Dropwizard Service which extends ```SpringService``` rather than ```Service```, and create your Spring application context.
+To use Dropwizard/Spring you just have to add a ```SpringBundle``` and create your Spring application context.
 
 For example :
 
 ```java
-public class HelloApp extends SpringService<HelloAppConfiguration> {
+   public class HelloApp extends Service<HelloAppConfiguration> {
 
-    private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
+       private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 
-    public static void main(String[] args) throws Exception {
-        new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
-    }
+       public static void main(String[] args) throws Exception {
+           new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
+       }
 
-    public HelloApp() {
-        super("hello-application");
-    }
+       @Override
+       public void initialize(Bootstrap<HelloAppConfiguration> bootstrap) {
+           bootstrap.addBundle(new SpringBundle(applicationContext(), true, true));
+       }
 
-    @Override
-    protected ConfigurableApplicationContext initializeApplicationContext(HelloAppConfiguration configuration, Environment environment) throws BeansException {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.scan("hello");
+       @Override
+       public void run(HelloAppConfiguration configuration, Environment environment) throws Exception {
+          // doing nothing
+       }
 
-        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 
-        // Register ConfigurationPlaceholderConfigurer
-        ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
-        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(false); // To test all placeholders are resolved
-        placeholderConfigurer.setPlaceholderPrefix("${dw.");
-        placeholderConfigurer.setPlaceholderSuffix("}");
-        beanFactory.registerSingleton("placeholderConfigurer", placeholderConfigurer);
-
-        // Register Configuration
-        beanFactory.registerSingleton("dw", configuration);
-
-        // Refresh
-        context.refresh();
-        return context;
-    }
-}
+       private ConfigurableApplicationContext applicationContext() throws BeansException {
+           AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+           context.scan("hello");
+           return context;
+       }
+   }
 ```
 
 In this example we create a Spring application context based on annotation to resolve Spring beans.
 
-Moreover we register a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${dw.http.port}```.
+Moreover the ```SpringBundle``` class register :
 
-Finally, we register the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
+ - a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${dw.http.port}```).
+ - the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
 
 Please take a look at the hello application located in ```src/test/java/hello```.
 

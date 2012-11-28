@@ -3,7 +3,6 @@ package com.github.nhuray.dropwizard.spring;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
-import hello.HelloApp;
 import hello.config.HelloAppConfiguration;
 import hello.config.HelloConfiguration;
 import hello.health.HelloHealthCheck;
@@ -15,23 +14,29 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 
-public class SpringServiceTest {
-
-    private HelloAppConfiguration configuration;
+public class SpringBundleTest {
 
     @Mock
     private Environment environment;
 
+    private HelloAppConfiguration configuration;
+
+    private SpringBundle bundle;
+
     @Before
-    public void initMocks() {
+    public void setup() {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.scan("hello");
+        bundle = new SpringBundle(context, true);
+
         MockitoAnnotations.initMocks(this);
 
         HelloConfiguration hello = new HelloConfiguration();
@@ -42,10 +47,9 @@ public class SpringServiceTest {
     }
 
     @Test
-    public void itInstallsResources() throws Exception {
+    public void registerResources() throws Exception {
         // When
-        HelloApp s = new HelloApp();
-        s.initializeWithBundles(configuration, environment);
+        bundle.run(configuration, environment);
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
@@ -54,10 +58,9 @@ public class SpringServiceTest {
     }
 
     @Test
-    public void itWiresUpDependencies() throws Exception {
+    public void wiresUpDependencies() throws Exception {
         // When
-        HelloApp s = new HelloApp();
-        s.initializeWithBundles(configuration, environment);
+        bundle.run(configuration, environment);
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
@@ -65,15 +68,14 @@ public class SpringServiceTest {
 
         HelloResource r = resource.getValue();
         final HelloService helloService = r.getHelloService();
-        assertThat(helloService, not(nullValue()));
+        assertNotNull(helloService);
         assertThat(helloService.getMessage(), is("Hello"));
     }
 
     @Test
-    public void itResolveDropwizardConfiguration() throws Exception {
+    public void registerConfiguration() throws Exception {
         // When
-        HelloApp s = new HelloApp();
-        s.initializeWithBundles(configuration, environment);
+        bundle.run(configuration, environment);
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
@@ -84,10 +86,9 @@ public class SpringServiceTest {
     }
 
     @Test
-    public void itInstallsHealthChecks() throws Exception {
+    public void registerHealthChecks() throws Exception {
         // When
-        HelloApp s = new HelloApp();
-        s.initializeWithBundles(configuration, environment);
+        bundle.run(configuration, environment);
 
         // Then
         ArgumentCaptor<? extends HealthCheck> healthCheck = ArgumentCaptor.forClass(HealthCheck.class);
@@ -96,10 +97,9 @@ public class SpringServiceTest {
     }
 
     @Test
-    public void itInstallsTasks() throws Exception {
+    public void registerTasks() throws Exception {
         // When
-        HelloApp s = new HelloApp();
-        s.initializeWithBundles(configuration, environment);
+        bundle.run(configuration, environment);
 
         // Then
         ArgumentCaptor<? extends Task> task = ArgumentCaptor.forClass(Task.class);

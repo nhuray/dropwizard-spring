@@ -17,15 +17,15 @@ public class HelloResource {
     @Autowired
     private HelloService helloService;
 
-    @Value("${dw.http.port}")
+    @Value("${http.port}")
     private Integer port;
 
-    @Value("${dw.http.connectorType}")
+    @Value("${http.connectorType}")
     private String connectorType;
 
     @GET
     public Response doGet() {
-        return Response.ok(String.format("%s<br/>Hello application is running on port : %d; connectortType : %s", helloService.greeting(), port, connectorType)).build();
+        return Response.ok(String.format("%s<br/>Hello application is running on port : %d; connectorType : %s", helloService.greeting(), port, connectorType)).build();
     }
 
     public HelloService getHelloService() {

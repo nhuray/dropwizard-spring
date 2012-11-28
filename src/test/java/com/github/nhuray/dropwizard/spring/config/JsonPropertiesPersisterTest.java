@@ -3,7 +3,6 @@ package com.github.nhuray.dropwizard.spring.config;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 import java.io.InputStream;
 import java.util.Properties;
 

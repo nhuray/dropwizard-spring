@@ -1,8 +1,8 @@
 package com.github.nhuray.dropwizard.spring.config;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yammer.dropwizard.config.Configuration;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.junit.Test;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 

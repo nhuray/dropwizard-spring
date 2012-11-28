@@ -1,46 +1,66 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.yammer.dropwizard.Service;
+import com.yammer.dropwizard.Bundle;
+import com.yammer.dropwizard.ConfiguredBundle;
+import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.lifecycle.Managed;
-import com.yammer.dropwizard.logging.Log;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.springframework.beans.BeansException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.util.Assert;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 import java.util.Map;
 
 /**
- * Service which load Spring Application context to automatically initialize Dropwizard {@link Environment}
+ * A bundle which load Spring Application context to automatically initialize Dropwizard {@link Environment}
  * including health checks, resources, providers, tasks and managed.
- * <p/>
- * <p/>
- * This code was inspired from  <a href="https://com.com/jaredstehler/dropwizard-guice">dropwizard-guice</a>.
- *
- * @author jstehler
- * @author nhuray
  */
-public abstract class SpringService<T extends Configuration> extends Service<T> {
+public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
-    private static final Log LOG = Log.forClass(SpringService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpringBundle.class);
 
-    protected SpringService(String name) {
-        super(name);
+    private ConfigurableApplicationContext context;
+    private boolean registerConfiguration;
+
+    /**
+     * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
+     * <p/>
+     * This constructor doesn't register Dropwizard Configuration as a Spring Bean.
+     *
+     * @param context the application context to load
+     */
+    public SpringBundle(ConfigurableApplicationContext context) {
+        this(context, false);
+    }
+
+    /**
+     * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
+     * <p/>
+     * @param context the application context to load
+     * @param registerConfiguration register dropwizard configuration as a Spring Bean.
+     */
+    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration) {
+        if (registerConfiguration) {
+            Assert.isTrue(!context.isActive(), "Context must be not active in order to register configuration");
+        }
+        this.context = context;
+        this.registerConfiguration = registerConfiguration;
     }
 
     @Override
-    protected void initialize(T configuration, Environment environment) throws Exception {
-        // User initilization of Spring Application context
-        ConfigurableApplicationContext context = initializeApplicationContext(configuration, environment);
+    public void run(T configuration, Environment environment) throws Exception {
+        // Register Dropwizard configuration as a Spring Bean
+        if (registerConfiguration) registerConfiguration(configuration, context);
 
         // Initialize Dropwizard environment
         addHealthChecks(environment, context);
@@ -52,17 +72,11 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
         addLifecycle(environment, context);
     }
 
-    /**
-     * Initialization method for a Spring {@link ApplicationContext}.
-     * <p/>
-     *
-     * @param configuration dropwizard configuration
-     * @param environment   dropwizard environment
-     * @return the application context
-     * @throws BeansException if context creation failed
-     */
-    protected abstract ConfigurableApplicationContext initializeApplicationContext(T configuration, Environment environment) throws BeansException;
 
+    @Override
+    public void initialize(Bootstrap<?> bootstrap) {
+        // nothing doing
+    }
 
     // ~ Dropwizard Environment initialization methods
 
@@ -73,8 +87,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             Managed managed = beansOfType.get(beanName);
             environment.manage(managed);
             LOG.info("Added managed: " + managed.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -85,8 +97,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             LifeCycle lifeCycle = beansOfType.get(beanName);
             environment.manage(lifeCycle);
             LOG.info("Added lifeCycle: " + lifeCycle.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -97,8 +107,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             Task task = beansOfType.get(beanName);
             environment.addTask(task);
             LOG.info("Added task: " + task.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -109,8 +117,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             HealthCheck healthCheck = beansOfType.get(beanName);
             environment.addHealthCheck(healthCheck);
             LOG.info("Added healthCheck: " + healthCheck.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -121,8 +127,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             InjectableProvider injectableProvider = beansOfType.get(beanName);
             environment.addProvider(injectableProvider);
             LOG.info("Added injectable provider: " + injectableProvider.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -133,8 +137,6 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             Object provider = beansWithAnnotation.get(beanName);
             environment.addProvider(provider);
             LOG.info("Added provider : " + provider.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
@@ -145,16 +147,26 @@ public abstract class SpringService<T extends Configuration> extends Service<T> 
             Object resource = beansWithAnnotation.get(beanName);
             environment.addResource(resource);
             LOG.info("Added resource : " + resource.getClass().getName());
-            // Remove from Spring application context
-            removeBeanDefinition(context, beanName);
         }
     }
 
-    private void removeBeanDefinition(ConfigurableApplicationContext context, String beanName) {
-        ConfigurableListableBeanFactory configurableListableBeanFactory = context.getBeanFactory();
-        BeanDefinitionRegistry beanDefinitionRegistry = (BeanDefinitionRegistry) configurableListableBeanFactory;
-        // Removing the bean from container
-        beanDefinitionRegistry.removeBeanDefinition(beanName);
+
+    private void registerConfiguration(T configuration, ConfigurableApplicationContext context) {
+        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+
+        // Register ConfigurationPlaceholderConfigurer
+        ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
+        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
+        beanFactory.registerSingleton("dw-placeholder", placeholderConfigurer);
+
+        // Register Configuration
+        beanFactory.registerSingleton("dw", configuration);
+
+        // Refresh context now
+        context.refresh();
     }
 
+    public ConfigurableApplicationContext getContext() {
+        return context;
+    }
 }

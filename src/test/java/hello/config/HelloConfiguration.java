@@ -1,9 +1,9 @@
 package hello.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import hello.health.HelloHealthCheck;
 import hello.service.HelloService;
 import hello.tasks.HelloTask;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HelloConfiguration {
 
-    @Value("${dw.hello.message}")
+    @Value("${hello.message}")
     @JsonProperty
     private String message;
 
