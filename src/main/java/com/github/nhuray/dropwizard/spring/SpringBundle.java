@@ -106,7 +106,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add managed to Dropwizard environment
             Managed managed = beansOfType.get(beanName);
             environment.manage(managed);
-            LOG.info("Added managed: " + managed.getClass().getName());
+            LOG.info("Add managed: " + managed.getClass().getName());
         }
     }
 
@@ -116,7 +116,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add lifeCycle to Dropwizard environment
             LifeCycle lifeCycle = beansOfType.get(beanName);
             environment.manage(lifeCycle);
-            LOG.info("Added lifeCycle: " + lifeCycle.getClass().getName());
+            LOG.info("Add lifeCycle: " + lifeCycle.getClass().getName());
         }
     }
 
@@ -126,7 +126,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add task to Dropwizard environment
             Task task = beansOfType.get(beanName);
             environment.addTask(task);
-            LOG.info("Added task: " + task.getClass().getName());
+            LOG.info("Add task: " + task.getClass().getName());
         }
     }
 
@@ -136,7 +136,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add healthCheck to Dropwizard environment
             HealthCheck healthCheck = beansOfType.get(beanName);
             environment.addHealthCheck(healthCheck);
-            LOG.info("Added healthCheck: " + healthCheck.getClass().getName());
+            LOG.info("Add healthCheck: " + healthCheck.getClass().getName());
         }
     }
 
@@ -146,7 +146,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add injectableProvider to Dropwizard environment
             InjectableProvider injectableProvider = beansOfType.get(beanName);
             environment.addProvider(injectableProvider);
-            LOG.info("Added injectable provider: " + injectableProvider.getClass().getName());
+            LOG.info("Add injectable provider: " + injectableProvider.getClass().getName());
         }
     }
 
@@ -156,7 +156,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add injectableProvider to Dropwizard environment
             Object provider = beansWithAnnotation.get(beanName);
             environment.addProvider(provider);
-            LOG.info("Added provider : " + provider.getClass().getName());
+            LOG.info("Add provider : " + provider.getClass().getName());
         }
     }
 
@@ -166,7 +166,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add injectableProvider to Dropwizard environment
             Object resource = beansWithAnnotation.get(beanName);
             environment.addResource(resource);
-            LOG.info("Added resource : " + resource.getClass().getName());
+            LOG.info("Add resource : " + resource.getClass().getName());
         }
     }
 
@@ -179,6 +179,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     private void registerConfiguration(T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         beanFactory.registerSingleton("dw", configuration);
+        LOG.info("Register Dropwizard Configuration under name : dw");
     }
 
 
@@ -193,6 +194,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         if (placeholderConfigurer == null) placeholderConfigurer = new ConfigurationPlaceholderConfigurer();
         placeholderConfigurer.setConfiguration(configuration);
         beanFactory.registerSingleton("dw-placeholder", placeholderConfigurer);
+        LOG.info("Register Dropwizard Placeholder under name : dw-placeholder");
     }
 
 
