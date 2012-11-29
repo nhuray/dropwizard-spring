@@ -35,7 +35,7 @@ public class SpringBundleTest {
     public void setup() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
         context.scan("hello");
-        bundle = new SpringBundle(context, true);
+        bundle = new SpringBundle(context, true, true);
 
         MockitoAnnotations.initMocks(this);
 
@@ -105,5 +105,19 @@ public class SpringBundleTest {
         ArgumentCaptor<? extends Task> task = ArgumentCaptor.forClass(Task.class);
         verify(environment).addTask(task.capture());
         assertThat(task.getValue(), is(HelloTask.class));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterConfigurationIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, true, false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterPlaceholderIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, false, true);
     }
 }

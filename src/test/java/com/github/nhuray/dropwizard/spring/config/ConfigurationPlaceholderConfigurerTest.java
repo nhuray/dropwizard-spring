@@ -3,6 +3,7 @@ package com.github.nhuray.dropwizard.spring.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yammer.dropwizard.config.Configuration;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 
@@ -19,12 +20,17 @@ import static org.springframework.beans.factory.support.BeanDefinitionBuilder.ro
  */
 public class ConfigurationPlaceholderConfigurerTest {
 
+    private ConfigurationPlaceholderConfigurer placeholder;
+
+    @Before
+    public void setUp() throws Exception {
+        placeholder = new ConfigurationPlaceholderConfigurer();
+    }
+
     @Test
     public void defaultPlaceholder() {
         // Given
-        Configuration defaultConfiguration = new Configuration();
-        ConfigurationPlaceholderConfigurer dc = new ConfigurationPlaceholderConfigurer(defaultConfiguration);
-
+        placeholder.setConfiguration(new Configuration());
 
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
@@ -33,7 +39,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                         .getBeanDefinition());
 
         // When
-        dc.postProcessBeanFactory(bf);
+        placeholder.postProcessBeanFactory(bf);
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
@@ -43,10 +49,9 @@ public class ConfigurationPlaceholderConfigurerTest {
     @Test
     public void customPlaceholderPrefixAndSuffix() {
         // Given
-        Configuration defaultConfiguration = new Configuration();
-        ConfigurationPlaceholderConfigurer dc = new ConfigurationPlaceholderConfigurer(defaultConfiguration);
-        dc.setPlaceholderPrefix("@<");
-        dc.setPlaceholderSuffix(">");
+        placeholder.setConfiguration(new Configuration());
+        placeholder.setPlaceholderPrefix("@<");
+        placeholder.setPlaceholderSuffix(">");
 
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
@@ -56,7 +61,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                         .getBeanDefinition());
 
         // When
-        dc.postProcessBeanFactory(bf);
+        placeholder.postProcessBeanFactory(bf);
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
@@ -67,9 +72,8 @@ public class ConfigurationPlaceholderConfigurerTest {
     @Test
     public void nullValueIsPreserved() {
         // Given
-        Configuration configuration = new ConfigurationWithNull();
-        ConfigurationPlaceholderConfigurer dc = new ConfigurationPlaceholderConfigurer(configuration);
-        dc.setNullValue("nullField");
+        placeholder.setConfiguration(new ConfigurationWithNull());
+        placeholder.setNullValue("nullField");
 
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
@@ -78,7 +82,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                         .getBeanDefinition());
 
         // When
-        dc.postProcessBeanFactory(bf);
+        placeholder.postProcessBeanFactory(bf);
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);

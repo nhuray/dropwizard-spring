@@ -1,6 +1,7 @@
 package com.github.nhuray.dropwizard.spring;
 
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
+import com.google.common.base.Preconditions;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.yammer.dropwizard.Bundle;
 import com.yammer.dropwizard.ConfiguredBundle;
@@ -30,7 +31,10 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     private static final Logger LOG = LoggerFactory.getLogger(SpringBundle.class);
 
     private ConfigurableApplicationContext context;
+    private ConfigurationPlaceholderConfigurer placeholderConfigurer;
     private boolean registerConfiguration;
+    private boolean registerPlaceholder;
+
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
@@ -40,27 +44,35 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      * @param context the application context to load
      */
     public SpringBundle(ConfigurableApplicationContext context) {
-        this(context, false);
+        this(context, false, false);
     }
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
      * <p/>
-     * @param context the application context to load
+     *
+     * @param context               the application context to load
      * @param registerConfiguration register dropwizard configuration as a Spring Bean.
      */
-    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration) {
-        if (registerConfiguration) {
-            Assert.isTrue(!context.isActive(), "Context must be not active in order to register configuration");
+    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration, boolean registerPlaceholder) {
+        if (registerConfiguration || registerPlaceholder) {
+            Preconditions.checkArgument(!context.isActive(), "Context must be not active in order to register configuration or placeholder");
         }
         this.context = context;
         this.registerConfiguration = registerConfiguration;
+        this.registerPlaceholder = registerPlaceholder;
     }
 
     @Override
     public void run(T configuration, Environment environment) throws Exception {
-        // Register Dropwizard configuration as a Spring Bean
+        // Register Dropwizard Configuration as a Bean Spring.
         if (registerConfiguration) registerConfiguration(configuration, context);
+
+        // Register a placeholder to resolve Dropwizard Configuration as properties.
+        if (registerPlaceholder) registerPlaceholder(configuration, context);
+
+        // Refresh context if is not active
+        if (!context.isActive()) context.refresh();
 
         // Initialize Dropwizard environment
         addHealthChecks(environment, context);
@@ -78,7 +90,15 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         // nothing doing
     }
 
-    // ~ Dropwizard Environment initialization methods
+    public ConfigurableApplicationContext getContext() {
+        return context;
+    }
+
+    public void setPlaceholderConfigurer(ConfigurationPlaceholderConfigurer placeholderConfigurer) {
+        this.placeholderConfigurer = placeholderConfigurer;
+    }
+
+// ~ Dropwizard Environment initialization methods
 
     private void addManaged(Environment environment, ConfigurableApplicationContext context) {
         final Map<String, Managed> beansOfType = context.getBeansOfType(Managed.class);
@@ -150,23 +170,30 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         }
     }
 
-
+    /**
+     * Register Dropwizard Configuration as a Bean Spring.
+     *
+     * @param configuration Dropwizard configuration
+     * @param context       spring application context
+     */
     private void registerConfiguration(T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-
-        // Register ConfigurationPlaceholderConfigurer
-        ConfigurationPlaceholderConfigurer placeholderConfigurer = new ConfigurationPlaceholderConfigurer(configuration);
-        placeholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
-        beanFactory.registerSingleton("dw-placeholder", placeholderConfigurer);
-
-        // Register Configuration
         beanFactory.registerSingleton("dw", configuration);
-
-        // Refresh context now
-        context.refresh();
     }
 
-    public ConfigurableApplicationContext getContext() {
-        return context;
+
+    /**
+     * Register a placeholder to resolve Dropwizard Configuration as properties.
+     *
+     * @param configuration Dropwizard configuration
+     * @param context       spring application context
+     */
+    private void registerPlaceholder(T configuration, ConfigurableApplicationContext context) {
+        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+        if (placeholderConfigurer == null) placeholderConfigurer = new ConfigurationPlaceholderConfigurer();
+        placeholderConfigurer.setConfiguration(configuration);
+        beanFactory.registerSingleton("dw-placeholder", placeholderConfigurer);
     }
+
+
 }

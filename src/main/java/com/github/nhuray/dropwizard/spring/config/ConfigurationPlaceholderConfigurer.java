@@ -36,7 +36,9 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
 
     private Configuration configuration;
 
-    private ObjectMapper mapper;
+    private ObjectMapper mapper = new ObjectMapper();
+
+    private PropertiesPersister propertiesPersister = new JsonPropertiesPersister(mapper);
 
     // ~ Copied from {@link PlaceholderConfigurerSupport} ----------------------------------------------------------------------
 
@@ -61,20 +63,6 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
     protected boolean ignoreUnresolvablePlaceholders = false;
 
     protected String nullValue;
-
-    private PropertiesPersister propertiesPersister ;
-
-
-
-    public ConfigurationPlaceholderConfigurer(Configuration configuration) {
-        this.configuration = configuration;
-
-        // Initialize ObjectMapper
-        mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);     // Only Serialize fields
-        this.propertiesPersister = new JsonPropertiesPersister(mapper);
-    }
-
 
     /**
      * {@linkplain #processProperties process} properties against the given bean factory.
@@ -167,21 +155,13 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
         this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
     }
 
-    public void setMapper(ObjectMapper mapper) {
-        Assert.notNull(mapper, "mapper is required");
-        this.mapper = mapper;
+    /**
+     * Set the configuration to load properties.
+     */
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 
-    /**
-     * Set the PropertiesPersister to use for parsing properties files.
-     * The default is DefaultPropertiesPersister.
-     *
-     * @see org.springframework.util.DefaultPropertiesPersister
-     */
-    public void setPropertiesPersister(PropertiesPersister propertiesPersister) {
-        Assert.notNull(propertiesPersister, "propertiesPersister is required");
-        this.propertiesPersister = propertiesPersister;
-    }
 
     // ~ Copied from {@link PropertyPlaceholderConfigurer} ----------------------------------------------------------------------
 

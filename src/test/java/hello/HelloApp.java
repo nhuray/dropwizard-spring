@@ -22,7 +22,7 @@ public class HelloApp extends Service<HelloAppConfiguration> {
 
     @Override
     public void initialize(Bootstrap<HelloAppConfiguration> bootstrap) {
-        bootstrap.addBundle(new SpringBundle(applicationContext(), true));
+        bootstrap.addBundle(new SpringBundle(applicationContext(), true, true));
     }
 
     @Override
