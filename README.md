@@ -42,7 +42,7 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 Usage
 ------------
 
-The Dropwizard/Spring integration allow to automatically initialize Dropwizard Environment through a Spring application context including health checks, resources, providers, tasks and managed.
+The Dropwizard/Spring integration allow to automatically initialize Dropwizard environment through a Spring application context including health checks, resources, providers, tasks and managed.
 
 To use Dropwizard/Spring you just have to add a ```SpringBundle``` and create your Spring application context.
 
@@ -82,9 +82,9 @@ The ```SpringBundle``` class use the application context to initialize Dropwizar
 
 Moreover the ```SpringBundle``` class register :
 
- - a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${dw.http.port}```).
+ - a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard configuration as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${http.port}```).
 
- - the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
+ - the Dropwizard configuration with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
 
 Please take a look at the hello application located in ```src/test/java/hello```.
 
