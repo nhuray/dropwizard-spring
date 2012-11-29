@@ -35,7 +35,7 @@ public class JsonPropertiesPersister extends DefaultPropertiesPersister {
     }
 
     /**
-     * We want to traverse map representing Yaml object and each time we find String=String pair we want to
+     * We want to traverse map representing Json object and each time we find String:String pair we want to
      * save it as Property. As we are going deeper into map we generate compound key as path-like String
      *
      * @param props
