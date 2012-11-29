@@ -17,7 +17,7 @@ This project provide a simple method for integrating Spring with Dropwizard.
 Versions
 ------------
 
-The current version of the project is **0.1**.
+The current version of the project is **0.2**.
 
 | dropwizard-spring  | Dropwizard   | Spring        |
 |:------------------:|:------------:|:-------------:|
@@ -42,43 +42,48 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 Usage
 ------------
 
+The Dropwizard/Spring integration allow to automatically initialize Dropwizard Environment through a Spring application context including health checks, resources, providers, tasks and managed.
+
 To use Dropwizard/Spring you just have to add a ```SpringBundle``` and create your Spring application context.
 
 For example :
 
 ```java
-   public class HelloApp extends Service<HelloAppConfiguration> {
+public class HelloApp extends Service<HelloAppConfiguration> {
 
-       private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
+    private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 
-       public static void main(String[] args) throws Exception {
-           new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
-       }
+    public static void main(String[] args) throws Exception {
+      new HelloApp().run(new String[]{"server", CONFIGURATION_FILE});
+    }
 
-       @Override
-       public void initialize(Bootstrap<HelloAppConfiguration> bootstrap) {
-           bootstrap.addBundle(new SpringBundle(applicationContext(), true, true));
-       }
+    @Override
+    public void initialize(Bootstrap<HelloAppConfiguration> bootstrap) {
+      bootstrap.addBundle(new SpringBundle(applicationContext(), true, true)); // register configuration and placeholder
+    }
 
-       @Override
-       public void run(HelloAppConfiguration configuration, Environment environment) throws Exception {
-          // doing nothing
-       }
+    @Override
+    public void run(HelloAppConfiguration configuration, Environment environment) throws Exception {
+      // doing nothing
+    }
 
 
-       private ConfigurableApplicationContext applicationContext() throws BeansException {
-           AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-           context.scan("hello");
-           return context;
-       }
-   }
+    private ConfigurableApplicationContext applicationContext() throws BeansException {
+      AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+      context.scan("hello");
+      return context;
+    }
+}
 ```
 
 In this example we create a Spring application context based on annotation to resolve Spring beans.
 
+The ```SpringBundle``` class use the application context to initialize Dropwizard environment including health checks, resources, providers, tasks and managed.
+
 Moreover the ```SpringBundle``` class register :
 
  - a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard ```Configuration``` as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${dw.http.port}```).
+
  - the Dropwizard ```Configuration``` itself with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
 
 Please take a look at the hello application located in ```src/test/java/hello```.
