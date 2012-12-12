@@ -7,7 +7,7 @@
     </parent>
     <groupId>com.github.nhuray</groupId>
     <artifactId>dropwizard-spring</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
