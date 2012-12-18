@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
@@ -31,9 +32,11 @@ public class SpringBundleTest {
 
     private SpringBundle bundle;
 
+    private AnnotationConfigApplicationContext context;
+
     @Before
     public void setup() {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context = new AnnotationConfigApplicationContext();
         context.scan("hello");
         bundle = new SpringBundle(context, true, true);
 
@@ -119,5 +122,14 @@ public class SpringBundleTest {
         // When
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
         bundle = new SpringBundle(context, false, true);
+    }
+
+    @Test
+    public void registerEnvironment() throws Exception {
+        // When
+        bundle.run(configuration, environment);
+
+        // Then
+        assertThat(context.getBean("dw-environment"), instanceOf(Environment.class));
     }
 }
