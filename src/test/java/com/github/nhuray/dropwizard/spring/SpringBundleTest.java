@@ -1,5 +1,6 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
@@ -38,7 +39,7 @@ public class SpringBundleTest {
     public void setup() {
         context = new AnnotationConfigApplicationContext();
         context.scan("hello");
-        bundle = new SpringBundle(context, true, true);
+        bundle = new SpringBundle(context, true, true, true);
 
         MockitoAnnotations.initMocks(this);
 
@@ -58,34 +59,6 @@ public class SpringBundleTest {
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
         verify(environment).addResource(resource.capture());
         assertThat(resource.getValue(), is(HelloResource.class));
-    }
-
-    @Test
-    public void wiresUpDependencies() throws Exception {
-        // When
-        bundle.run(configuration, environment);
-
-        // Then
-        ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment).addResource(resource.capture());
-
-        HelloResource r = resource.getValue();
-        final HelloService helloService = r.getHelloService();
-        assertNotNull(helloService);
-        assertThat(helloService.getMessage(), is("Hello"));
-    }
-
-    @Test
-    public void registerConfiguration() throws Exception {
-        // When
-        bundle.run(configuration, environment);
-
-        // Then
-        ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment).addResource(resource.capture());
-
-        HelloResource r = resource.getValue();
-        assertThat(r.getPort(), is(8080)); // Defaut port
     }
 
     @Test
@@ -110,18 +83,17 @@ public class SpringBundleTest {
         assertThat(task.getValue(), is(HelloTask.class));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void unableToRegisterConfigurationIfSpringContextIsActive() throws Exception {
+    @Test
+    public void registerConfiguration() throws Exception {
         // When
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
-        bundle = new SpringBundle(context, true, false);
-    }
+        bundle.run(configuration, environment);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void unableToRegisterPlaceholderIfSpringContextIsActive() throws Exception {
-        // When
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
-        bundle = new SpringBundle(context, false, true);
+        // Then
+        ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
+        verify(environment).addResource(resource.capture());
+
+        HelloResource r = resource.getValue();
+        assertThat(r.getPort(), is(8080)); // Defaut port
     }
 
     @Test
@@ -130,6 +102,51 @@ public class SpringBundleTest {
         bundle.run(configuration, environment);
 
         // Then
-        assertThat(context.getBean("dw-environment"), instanceOf(Environment.class));
+        assertThat(context.getBean("dwEnv"), instanceOf(Environment.class));
     }
+
+
+    @Test
+    public void wiresUpDependencies() throws Exception {
+        // When
+        bundle.run(configuration, environment);
+
+        // Then
+        ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
+        verify(environment).addResource(resource.capture());
+
+        HelloResource r = resource.getValue();
+        final HelloService helloService = r.getHelloService();
+        assertNotNull(helloService);
+        assertThat(helloService.getMessage(), is("Hello"));
+
+        assertThat(r.getConfiguration(), instanceOf(Configuration.class));
+        assertThat(r.getEnvironment(), instanceOf(Environment.class));
+    }
+
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterConfigurationIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, true, false, false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterPlaceholderIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, false, false, true);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterEnvironmentIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, false, true, false);
+    }
+
+
 }

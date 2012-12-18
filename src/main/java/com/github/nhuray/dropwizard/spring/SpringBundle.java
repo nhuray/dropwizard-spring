@@ -26,21 +26,25 @@ import java.util.Map;
  */
 public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
+    public static final String CONFIGURATION_BEAN_NAME = "dw";
+    public static final String ENVIRONMENT_BEAN_NAME = "dwEnv";
+    public static final String PLACEHOLDER_BEAN_NAME = "dwPlaceholder";
+
     private static final Logger LOG = LoggerFactory.getLogger(SpringBundle.class);
 
     private ConfigurableApplicationContext context;
     private ConfigurationPlaceholderConfigurer placeholderConfigurer;
     private boolean registerConfiguration;
+    private boolean registerEnvironment;
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
      * <p/>
-     * This constructor doesn't register Dropwizard Configuration as a Spring Bean.
      *
      * @param context the application context to load
      */
     public SpringBundle(ConfigurableApplicationContext context) {
-        this(context, false, false);
+        this(context, false, false, false);
     }
 
     /**
@@ -49,14 +53,16 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      *
      * @param context               the application context to load
      * @param registerConfiguration register Dropwizard configuration as a Spring Bean.
+     * @param registerEnvironment   register Dropwizard environment as a Spring Bean.
      * @param registerPlaceholder   resolve Dropwizard configuration as properties.
      */
-    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration, boolean registerPlaceholder) {
-        if (registerConfiguration || registerPlaceholder) {
-            Preconditions.checkArgument(!context.isActive(), "Context must be not active in order to register configuration or placeholder");
+    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration, boolean registerEnvironment, boolean registerPlaceholder) {
+        if (registerConfiguration || registerEnvironment  || registerPlaceholder) {
+            Preconditions.checkArgument(!context.isActive(), "Context must be not active in order to register configuration, environment or placeholder");
         }
         this.context = context;
         this.registerConfiguration = registerConfiguration;
+        this.registerEnvironment = registerEnvironment;
         if (registerPlaceholder) this.placeholderConfigurer = new ConfigurationPlaceholderConfigurer();
     }
 
@@ -66,13 +72,17 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      *
      * @param context               the application context to load
      * @param registerConfiguration register Dropwizard configuration as a Spring Bean.
+     * @param registerEnvironment   register Dropwizard environment as a Spring Bean.
      * @param placeholderConfigurer placeholderConfigurer to resolve Dropwizard configuration as properties.
      */
-    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration, ConfigurationPlaceholderConfigurer placeholderConfigurer) {
+    public SpringBundle(ConfigurableApplicationContext context, boolean registerConfiguration, boolean registerEnvironment, ConfigurationPlaceholderConfigurer placeholderConfigurer) {
         Preconditions.checkArgument(placeholderConfigurer != null, "PlaceholderConfigurer is required");
-        Preconditions.checkArgument(!context.isActive(), "Context must be not active in order to register configuration or placeholder");
+        if (registerConfiguration || registerEnvironment  || placeholderConfigurer != null) {
+            Preconditions.checkArgument(!context.isActive(), "Context must be not active in order to register configuration, environment or placeholder");
+        }
         this.context = context;
         this.registerConfiguration = registerConfiguration;
+        this.registerEnvironment = registerEnvironment;
         this.placeholderConfigurer = placeholderConfigurer;
     }
 
@@ -81,11 +91,11 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         // Register Dropwizard Configuration as a Bean Spring.
         if (registerConfiguration) registerConfiguration(configuration, context);
 
+        // Register the Dropwizard environment
+        if (registerEnvironment) registerEnvironment(environment, context);
+
         // Register a placeholder to resolve Dropwizard Configuration as properties.
         if (placeholderConfigurer != null) registerPlaceholder(configuration, context);
-
-        // Register the Dropwizard environment
-        registerEnvironment(environment, context);
 
         // Refresh context if is not active
         if (!context.isActive()) context.refresh();
@@ -119,6 +129,9 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         this.registerConfiguration = registerConfiguration;
     }
 
+    public void setRegisterEnvironment(boolean registerEnvironment) {
+        this.registerEnvironment = registerEnvironment;
+    }
 
     // ~ Dropwizard Environment initialization methods -----------------------------------------------------------------
 
@@ -149,9 +162,11 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         Map<String, LifeCycle> beansOfType = context.getBeansOfType(LifeCycle.class);
         for (String beanName : beansOfType.keySet()) {
             // Add lifeCycle to Dropwizard environment
-            LifeCycle lifeCycle = beansOfType.get(beanName);
-            environment.manage(lifeCycle);
-            LOG.info("Registering lifeCycle: " + lifeCycle.getClass().getName());
+            if (!beanName.equals(ENVIRONMENT_BEAN_NAME)) {
+                LifeCycle lifeCycle = beansOfType.get(beanName);
+                environment.manage(lifeCycle);
+                LOG.info("Registering lifeCycle: " + lifeCycle.getClass().getName());
+            }
         }
     }
 
@@ -240,15 +255,28 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     }
 
     /**
-     * Register Dropwizard Configuration as a Bean Spring.
+     * Register Dropwizard {@link Configuration} as a Bean Spring.
      *
-     * @param configuration Dropwizard configuration
+     * @param configuration Dropwizard {@link Configuration}
      * @param context       spring application context
      */
     private void registerConfiguration(T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-        beanFactory.registerSingleton("dw", configuration);
-        LOG.info("Registering Dropwizard Configuration under name : dw");
+        beanFactory.registerSingleton(CONFIGURATION_BEAN_NAME, configuration);
+        LOG.info("Registering Dropwizard Configuration under name : " + CONFIGURATION_BEAN_NAME);
+    }
+
+
+    /**
+     * Register Dropwizard {@link Environment} as a Bean Spring.
+     *
+     * @param environment Dropwizard {@link Environment}
+     * @param context     Spring application context
+     */
+    private void registerEnvironment(Environment environment, ConfigurableApplicationContext context) {
+        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+        beanFactory.registerSingleton(ENVIRONMENT_BEAN_NAME, environment);
+        LOG.info("Registering Dropwizard Environment under name : " + ENVIRONMENT_BEAN_NAME);
     }
 
 
@@ -261,20 +289,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     private void registerPlaceholder(T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         placeholderConfigurer.setConfiguration(configuration);
-        beanFactory.registerSingleton("dw-placeholder", placeholderConfigurer);
-        LOG.info("Registering Dropwizard Placeholder under name : dw-placeholder");
-    }
-
-
-    /**
-     * Register Dropwizard Configuration as a Bean Spring.
-     *
-     * @param environment Dropwizard {@link Environment}
-     * @param context     Spring application context
-     */
-    private void registerEnvironment(Environment environment, ConfigurableApplicationContext context) {
-        ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-        beanFactory.registerSingleton("dw-environment", environment);
-        LOG.info("Registering Dropwizard Environment under name : dw-environment");
+        beanFactory.registerSingleton(PLACEHOLDER_BEAN_NAME, placeholderConfigurer);
+        LOG.info("Registering Dropwizard Placeholder under name : " + PLACEHOLDER_BEAN_NAME);
     }
 }
