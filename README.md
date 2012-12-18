@@ -59,7 +59,8 @@ public class HelloApp extends Service<HelloAppConfiguration> {
 
     @Override
     public void initialize(Bootstrap<HelloAppConfiguration> bootstrap) {
-      bootstrap.addBundle(new SpringBundle(applicationContext(), true, true)); // register configuration and placeholder
+      // register configuration, environment and placeholder
+      bootstrap.addBundle(new SpringBundle(applicationContext(), true, true, true));
     }
 
     @Override
@@ -85,6 +86,8 @@ Moreover the ```SpringBundle``` class register :
  - a ```ConfigurationPlaceholderConfigurer``` to resolve Dropwizard configuration as [Spring placeholders](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/beans.html#beans-factory-placeholderconfigurer) (For example : ```${http.port}```).
 
  - the Dropwizard configuration with the name ```dw``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dw.httpConfiguration}```).
+
+ - the Dropwizard environment with the name ```dwEnv``` to retrieve complex configuration with [Spring Expression Language](http://static.springsource.org/spring/docs/3.1.x/spring-framework-reference/html/expressions.html) (For example : ```#{dwEnv.validator}```).
 
 Please take a look at the hello application located in ```src/test/java/hello```.
 
