@@ -95,7 +95,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         if (registerEnvironment) registerEnvironment(environment, context);
 
         // Register a placeholder to resolve Dropwizard Configuration as properties.
-        if (placeholderConfigurer != null) registerPlaceholder(configuration, context);
+        if (placeholderConfigurer != null) registerPlaceholder(environment, configuration, context);
 
         // Refresh context if is not active
         if (!context.isActive()) context.refresh();
@@ -286,8 +286,9 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      * @param configuration Dropwizard configuration
      * @param context       spring application context
      */
-    private void registerPlaceholder(T configuration, ConfigurableApplicationContext context) {
+    private void registerPlaceholder(Environment environment, T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+        placeholderConfigurer.setObjectMapper(environment.getObjectMapperFactory().build());
         placeholderConfigurer.setConfiguration(configuration);
         beanFactory.registerSingleton(PLACEHOLDER_BEAN_NAME, placeholderConfigurer);
         LOG.info("Registering Dropwizard Placeholder under name : " + PLACEHOLDER_BEAN_NAME);

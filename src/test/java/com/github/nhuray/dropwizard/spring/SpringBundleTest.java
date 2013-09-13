@@ -1,7 +1,9 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.Environment;
+import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import hello.config.HelloAppConfiguration;
@@ -22,12 +24,15 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.when;
 
 public class SpringBundleTest {
 
     @Mock
     private Environment environment;
+
+    @Mock
+    private ObjectMapperFactory objectMapperFactory;
 
     private HelloAppConfiguration configuration;
 
@@ -48,6 +53,9 @@ public class SpringBundleTest {
 
         configuration = new HelloAppConfiguration();
         configuration.setHello(hello);
+
+        when(environment.getObjectMapperFactory()).thenReturn(objectMapperFactory);
+        when(objectMapperFactory.build()).thenReturn(new ObjectMapper());
     }
 
     @Test

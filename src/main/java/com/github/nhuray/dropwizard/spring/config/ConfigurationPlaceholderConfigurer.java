@@ -31,9 +31,9 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
 
     private Configuration configuration;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private PropertiesPersister propertiesPersister = new JsonPropertiesPersister(mapper);
+    private PropertiesPersister propertiesPersister;
 
     // ~ Copied from {@link PlaceholderConfigurerSupport} ----------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
      */
     private void loadProperties(Properties props) throws BeansException, IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        mapper.writeValue(stream, configuration);
+        objectMapper.writeValue(stream, configuration);
         propertiesPersister.load(props, new ByteArrayInputStream(stream.toByteArray()));
     }
 
@@ -157,6 +157,10 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
         this.configuration = configuration;
     }
 
+    public void setObjectMapper(final ObjectMapper objectMapper) {
+      this.objectMapper = objectMapper;
+      this.propertiesPersister = new JsonPropertiesPersister(objectMapper);
+    }
 
     // ~ Copied from {@link PropertyPlaceholderConfigurer} ----------------------------------------------------------------------
 
