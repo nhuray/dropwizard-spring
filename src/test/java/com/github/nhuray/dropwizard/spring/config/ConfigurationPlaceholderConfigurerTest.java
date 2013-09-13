@@ -2,6 +2,7 @@ package com.github.nhuray.dropwizard.spring.config;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.dropwizard.config.Configuration;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +38,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                 rootBeanDefinition(ConfigurationTestBean.class)
                         .addPropertyValue("connectorType", "${http.connectorType}")
                         .getBeanDefinition());
+        placeholder.setObjectMapper(new ObjectMapper());
 
         // When
         placeholder.postProcessBeanFactory(bf);
@@ -59,6 +61,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                         .addPropertyValue("connectorType", "@<http.connectorType>")
                         .addPropertyValue("rootPath", "${key2}")
                         .getBeanDefinition());
+        placeholder.setObjectMapper(new ObjectMapper());
 
         // When
         placeholder.postProcessBeanFactory(bf);
@@ -80,6 +83,7 @@ public class ConfigurationPlaceholderConfigurerTest {
                 rootBeanDefinition(ConfigurationTestBean.class)
                         .addPropertyValue("connectorType", "${nullProperty}")
                         .getBeanDefinition());
+        placeholder.setObjectMapper(new ObjectMapper());
 
         // When
         placeholder.postProcessBeanFactory(bf);
