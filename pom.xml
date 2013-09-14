@@ -7,21 +7,26 @@
     </parent>
     <groupId>com.github.nhuray</groupId>
     <artifactId>dropwizard-spring</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
 
     <scm>
-        <connection>scm:git:git@github.com:nhuray/dropwizard-spring.git</connection>
-        <url>git@github.com:nhuray/dropwizard-spring</url>
-        <developerConnection>scm:git:git@github.com:nhuray/dropwizard-spring.git</developerConnection>
+        <connection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</connection>
+        <url>git@github.com:41quickbuild/dropwizard-spring</url>
+        <developerConnection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</developerConnection>
     </scm>
 
     <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/nhuray/dropwizard-spring/issues</url>
+      <system>JIRA</system>
+      <url>http://jira</url>
     </issueManagement>
+
+    <ciManagement>
+      <system>Bamboo</system>
+      <url>http://bamboo/bamboo</url>
+    </ciManagement>
 
     <licenses>
         <license>
@@ -40,10 +45,20 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+      <repository>
+        <id>nexus</id>
+        <url>http://nexus.the41.internal/content/repositories/releases/</url>
+      </repository>
+      <snapshotRepository>
+        <id>nexus</id>
+        <url>http://nexus.the41.internal/content/repositories/snapshots/</url>
+      </snapshotRepository>
+    </distributionManagement>
 
     <properties>
-        <dropwizard.version>0.6.0</dropwizard.version>
-        <spring.version>3.1.3.RELEASE</spring.version>
+        <dropwizard.version>0.6.2</dropwizard.version>
+        <spring.version>3.1.4.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -21,7 +21,8 @@ The current version of the project is **0.2**.
 
 | dropwizard-spring  | Dropwizard   | Spring        |
 |:------------------:|:------------:|:-------------:|
-| master (0.2)       | 0.6.0        | 3.1.3.RELEASE |
+| master (0.3.1)     | 0.6.2        | 3.1.4.RELEASE |
+| 0.2                | 0.6.0        | 3.1.3.RELEASE |
 | 0.1                | 0.5.1        | 3.1.1.RELEASE |
 
 
