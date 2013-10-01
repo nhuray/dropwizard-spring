@@ -1,5 +1,6 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import com.google.common.base.Preconditions;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -29,6 +30,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     public static final String CONFIGURATION_BEAN_NAME = "dw";
     public static final String ENVIRONMENT_BEAN_NAME = "dwEnv";
     public static final String PLACEHOLDER_BEAN_NAME = "dwPlaceholder";
+    public static final String OBJECT_MAPPER_BEAN_NAME = "dwObjectMapper";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringBundle.class);
 
@@ -288,9 +290,11 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      */
     private void registerPlaceholder(Environment environment, T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-        placeholderConfigurer.setObjectMapper(environment.getObjectMapperFactory().build());
+      final ObjectMapper objectMapper = environment.getObjectMapperFactory().build();
+      placeholderConfigurer.setObjectMapper(objectMapper);
         placeholderConfigurer.setConfiguration(configuration);
         beanFactory.registerSingleton(PLACEHOLDER_BEAN_NAME, placeholderConfigurer);
+        beanFactory.registerSingleton(OBJECT_MAPPER_BEAN_NAME, objectMapper);
         LOG.info("Registering Dropwizard Placeholder under name : " + PLACEHOLDER_BEAN_NAME);
     }
 }
