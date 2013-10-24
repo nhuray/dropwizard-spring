@@ -110,6 +110,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         registerInjectableProviders(environment, context);
         registerProviders(environment, context);
         registerResources(environment, context);
+        environment.manage(new SpringContextManaged(context));
     }
 
 
