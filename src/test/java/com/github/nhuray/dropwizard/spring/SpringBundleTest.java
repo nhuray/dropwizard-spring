@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
+import com.yammer.dropwizard.lifecycle.ServerLifecycleListener;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
+
+import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
 import hello.config.HelloAppConfiguration;
 import hello.config.HelloConfiguration;
 import hello.health.HelloHealthCheck;
@@ -89,6 +92,17 @@ public class SpringBundleTest {
         ArgumentCaptor<? extends Task> task = ArgumentCaptor.forClass(Task.class);
         verify(environment).addTask(task.capture());
         assertThat(task.getValue(), is(HelloTask.class));
+    }
+
+    @Test
+    public void registerServerLifecycleListener() throws Exception {
+        // When
+        bundle.run(configuration, environment);
+
+        // Then
+        ArgumentCaptor<? extends ServerLifecycleListener> listener = ArgumentCaptor.forClass(ServerLifecycleListener.class);
+        verify(environment).addServerLifecycleListener(listener.capture());
+        assertThat(listener.getValue(), is(HelloServerLifecycleListener.class));
     }
 
     @Test

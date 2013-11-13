@@ -2,6 +2,7 @@ package hello.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import hello.health.HelloHealthCheck;
+import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
 import hello.service.HelloService;
 import hello.tasks.HelloTask;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,11 @@ public class HelloConfiguration {
     @Bean
     public HelloHealthCheck helloHealthCheck() {
         return new HelloHealthCheck();
+    }
+
+    @Bean
+    public HelloServerLifecycleListener helloServerLifecycleListener() {
+      return new HelloServerLifecycleListener();
     }
 
     public String getMessage() {
