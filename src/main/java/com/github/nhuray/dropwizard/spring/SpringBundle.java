@@ -9,6 +9,7 @@ import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Configuration;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.lifecycle.Managed;
+import com.yammer.dropwizard.lifecycle.ServerLifecycleListener;
 import com.yammer.dropwizard.tasks.Task;
 import com.yammer.metrics.core.HealthCheck;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -105,6 +106,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         // Initialize Dropwizard environment
         registerManaged(environment, context);
         registerLifecycle(environment, context);
+        registerServerLifecycleListeners(environment, context);
         registerTasks(environment, context);
         registerHealthChecks(environment, context);
         registerInjectableProviders(environment, context);
@@ -175,6 +177,25 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
 
     /**
+     * Register {@link ServerLifecycleListener}s in Dropwizard {@link Environment} from Spring application context.
+     *
+     * @param environment the Dropwizard environment
+     * @param context     the Spring application context
+     */
+    private void registerServerLifecycleListeners(Environment environment, ConfigurableApplicationContext context) {
+      Map<String, ServerLifecycleListener> beansOfType = context.getBeansOfType(ServerLifecycleListener.class);
+      for (String beanName : beansOfType.keySet()) {
+        // Add serverLifecycleListener to Dropwizard environment
+        if (!beanName.equals(ENVIRONMENT_BEAN_NAME)) {
+          ServerLifecycleListener serverLifecycleListener = beansOfType.get(beanName);
+          environment.addServerLifecycleListener(serverLifecycleListener);
+          LOG.info("Registering serverLifecycleListener: " + serverLifecycleListener.getClass().getName());
+        }
+      }
+    }
+
+
+  /**
      * Register {@link Task}s in Dropwizard {@link Environment} from Spring application context.
      *
      * @param environment the Dropwizard environment
