@@ -13,9 +13,9 @@
     <description>Dropwizard/Spring integration</description>
 
     <scm>
-        <connection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</connection>
-        <url>git@github.com:41quickbuild/dropwizard-spring</url>
-        <developerConnection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/41quickbuild/dropwizard-spring.git</connection>
+        <url>http://github.com/41quickbuild/dropwizard-spring</url>
+        <developerConnection>scm:git:ssh://git@github.com/41quickbuild/dropwizard-spring.git</developerConnection>
     </scm>
 
     <issueManagement>
