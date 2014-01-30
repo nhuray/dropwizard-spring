@@ -1,7 +1,7 @@
 package hello.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.yammer.dropwizard.config.Configuration;
+import io.dropwizard.Configuration;
 
 public class HelloAppConfiguration extends Configuration {
 

@@ -1,9 +1,10 @@
 package com.github.nhuray.dropwizard.spring.config;
 
 
+import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.dropwizard.config.Configuration;
+import io.dropwizard.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -36,7 +37,7 @@ public class ConfigurationPlaceholderConfigurerTest {
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
                 rootBeanDefinition(ConfigurationTestBean.class)
-                        .addPropertyValue("connectorType", "${http.connectorType}")
+                        .addPropertyValue("loggingLevel", "${logging.level.levelStr}")
                         .getBeanDefinition());
         placeholder.setObjectMapper(new ObjectMapper());
 
@@ -45,7 +46,7 @@ public class ConfigurationPlaceholderConfigurerTest {
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
-        assertThat(bean.getConnectorType(), equalTo("blocking"));
+        assertThat(bean.getLoggingLevel(), equalTo(Level.INFO));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ConfigurationPlaceholderConfigurerTest {
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
                 rootBeanDefinition(ConfigurationTestBean.class)
-                        .addPropertyValue("connectorType", "@<http.connectorType>")
+                        .addPropertyValue("loggingLevel", "@<logging.level.levelStr>")
                         .addPropertyValue("rootPath", "${key2}")
                         .getBeanDefinition());
         placeholder.setObjectMapper(new ObjectMapper());
@@ -68,7 +69,7 @@ public class ConfigurationPlaceholderConfigurerTest {
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
-        assertThat(bean.getConnectorType(), is("blocking"));
+        assertThat(bean.getLoggingLevel(), is(Level.INFO));
         assertThat(bean.getRootPath(), is("${key2}"));
     }
 

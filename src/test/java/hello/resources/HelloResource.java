@@ -1,10 +1,8 @@
 package hello.resources;
 
 
-import com.yammer.dropwizard.config.Configuration;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.config.HttpConfiguration;
-import com.yammer.dropwizard.validation.Validator;
+import io.dropwizard.Configuration;
+import io.dropwizard.setup.Environment;
 import hello.service.HelloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +19,7 @@ public class HelloResource {
     @Autowired
     private HelloService helloService;
 
-    @Value("${http.port}")
+    @Value("${server.applicationConnectors[0].port}")
     private Integer port;
 
     @Value("#{dw}")
@@ -32,7 +30,10 @@ public class HelloResource {
 
     @GET
     public Response doGet() {
-        return Response.ok(String.format("%s<br/>Hello application is running on port : %d; connectorType : %s", helloService.greeting(), port, configuration.getHttpConfiguration().getConnectorType())).build();
+        return Response.ok(String.format("%s<br/>Hello application is running on port : %d;",
+                helloService.greeting(),
+                port)
+        ).build();
     }
 
     public HelloService getHelloService() {

@@ -3,16 +3,17 @@ package hello;
 
 import com.github.nhuray.dropwizard.spring.SpringBundle;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import hello.config.HelloAppConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import sun.misc.Service;
 
-public class HelloApp extends Service<HelloAppConfiguration> {
+public class HelloApp extends Application<HelloAppConfiguration> {
 
     private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 

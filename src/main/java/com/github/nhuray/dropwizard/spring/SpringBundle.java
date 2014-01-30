@@ -1,15 +1,17 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.codahale.metrics.health.HealthCheck;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import com.google.common.base.Preconditions;
 import com.sun.jersey.spi.inject.InjectableProvider;
-import com.yammer.dropwizard.ConfiguredBundle;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Configuration;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.lifecycle.Managed;
-import com.yammer.dropwizard.tasks.Task;
-import com.yammer.metrics.core.HealthCheck;
+import io.dropwizard.ConfiguredBundle;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.Configuration;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.lifecycle.Managed;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.servlets.tasks.Task;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
     public static final String CONFIGURATION_BEAN_NAME = "dw";
     public static final String ENVIRONMENT_BEAN_NAME = "dwEnv";
     public static final String PLACEHOLDER_BEAN_NAME = "dwPlaceholder";
+    public static final String OBJECT_MAPPER_BEAN_NAME = "dwObjectMapper";
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringBundle.class);
 
@@ -103,11 +106,13 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         // Initialize Dropwizard environment
         registerManaged(environment, context);
         registerLifecycle(environment, context);
+        registerServerLifecycleListeners(environment, context);
         registerTasks(environment, context);
         registerHealthChecks(environment, context);
         registerInjectableProviders(environment, context);
         registerProviders(environment, context);
         registerResources(environment, context);
+        environment.lifecycle().manage(new SpringContextManaged(context));
     }
 
 
@@ -146,7 +151,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansOfType.keySet()) {
             // Add managed to Dropwizard environment
             Managed managed = beansOfType.get(beanName);
-            environment.manage(managed);
+            environment.lifecycle().manage(managed);
             LOG.info("Registering managed: " + managed.getClass().getName());
         }
     }
@@ -164,7 +169,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
             // Add lifeCycle to Dropwizard environment
             if (!beanName.equals(ENVIRONMENT_BEAN_NAME)) {
                 LifeCycle lifeCycle = beansOfType.get(beanName);
-                environment.manage(lifeCycle);
+                environment.lifecycle().manage(lifeCycle);
                 LOG.info("Registering lifeCycle: " + lifeCycle.getClass().getName());
             }
         }
@@ -172,6 +177,25 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
 
     /**
+     * Register {@link ServerLifecycleListener}s in Dropwizard {@link Environment} from Spring application context.
+     *
+     * @param environment the Dropwizard environment
+     * @param context     the Spring application context
+     */
+    private void registerServerLifecycleListeners(Environment environment, ConfigurableApplicationContext context) {
+      Map<String, ServerLifecycleListener> beansOfType = context.getBeansOfType(ServerLifecycleListener.class);
+      for (String beanName : beansOfType.keySet()) {
+        // Add serverLifecycleListener to Dropwizard environment
+        if (!beanName.equals(ENVIRONMENT_BEAN_NAME)) {
+          ServerLifecycleListener serverLifecycleListener = beansOfType.get(beanName);
+          environment.servlets().addServletListeners(serverLifecycleListener);
+          LOG.info("Registering serverLifecycleListener: " + serverLifecycleListener.getClass().getName());
+        }
+      }
+    }
+
+
+  /**
      * Register {@link Task}s in Dropwizard {@link Environment} from Spring application context.
      *
      * @param environment the Dropwizard environment
@@ -182,7 +206,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansOfType.keySet()) {
             // Add task to Dropwizard environment
             Task task = beansOfType.get(beanName);
-            environment.addTask(task);
+            environment.admin().addTask(task);
             LOG.info("Registering task: " + task.getClass().getName());
         }
     }
@@ -199,7 +223,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansOfType.keySet()) {
             // Add healthCheck to Dropwizard environment
             HealthCheck healthCheck = beansOfType.get(beanName);
-            environment.addHealthCheck(healthCheck);
+            environment.healthChecks().register(beanName, healthCheck);
             LOG.info("Registering healthCheck: " + healthCheck.getClass().getName());
         }
     }
@@ -216,7 +240,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansOfType.keySet()) {
             // Add injectableProvider to Dropwizard environment
             InjectableProvider injectableProvider = beansOfType.get(beanName);
-            environment.addProvider(injectableProvider);
+            environment.jersey().register(injectableProvider);
             LOG.info("Registering injectable provider: " + injectableProvider.getClass().getName());
         }
     }
@@ -232,7 +256,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansWithAnnotation.keySet()) {
             // Add injectableProvider to Dropwizard environment
             Object provider = beansWithAnnotation.get(beanName);
-            environment.addProvider(provider);
+            environment.jersey().register(provider);
             LOG.info("Registering provider : " + provider.getClass().getName());
         }
     }
@@ -249,7 +273,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         for (String beanName : beansWithAnnotation.keySet()) {
             // Add injectableProvider to Dropwizard environment
             Object resource = beansWithAnnotation.get(beanName);
-            environment.addResource(resource);
+            environment.jersey().register(resource);
             LOG.info("Registering resource : " + resource.getClass().getName());
         }
     }
@@ -288,9 +312,11 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      */
     private void registerPlaceholder(Environment environment, T configuration, ConfigurableApplicationContext context) {
         ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-        placeholderConfigurer.setObjectMapper(environment.getObjectMapperFactory().build());
+        final ObjectMapper objectMapper = environment.getObjectMapper();
+        placeholderConfigurer.setObjectMapper(objectMapper);
         placeholderConfigurer.setConfiguration(configuration);
         beanFactory.registerSingleton(PLACEHOLDER_BEAN_NAME, placeholderConfigurer);
+        beanFactory.registerSingleton(OBJECT_MAPPER_BEAN_NAME, objectMapper);
         LOG.info("Registering Dropwizard Placeholder under name : " + PLACEHOLDER_BEAN_NAME);
     }
 }
