@@ -2,7 +2,7 @@ package hello.server_lifecycle_listeners;
 
 import org.eclipse.jetty.server.Server;
 
-import com.yammer.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 
 public class HelloServerLifecycleListener implements ServerLifecycleListener {
   @Override

@@ -1,12 +1,18 @@
 package com.github.nhuray.dropwizard.spring;
 
+import com.codahale.metrics.health.HealthCheckRegistry;
+import com.codahale.metrics.servlets.HealthCheckServlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.dropwizard.config.Configuration;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.json.ObjectMapperFactory;
-import com.yammer.dropwizard.lifecycle.ServerLifecycleListener;
-import com.yammer.dropwizard.tasks.Task;
-import com.yammer.metrics.core.HealthCheck;
+import io.dropwizard.Configuration;
+import io.dropwizard.jackson.Jackson;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
+import io.dropwizard.jetty.setup.ServletEnvironment;
+import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
+import io.dropwizard.setup.AdminEnvironment;
+import io.dropwizard.setup.Environment;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.servlets.tasks.Task;
+import com.codahale.metrics.health.HealthCheck;
 
 import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
 import hello.config.HelloAppConfiguration;
@@ -22,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertNotNull;
@@ -35,7 +42,19 @@ public class SpringBundleTest {
     private Environment environment;
 
     @Mock
-    private ObjectMapperFactory objectMapperFactory;
+    private JerseyEnvironment jersey;
+
+    @Mock
+    private AdminEnvironment admin;
+
+    @Mock
+    private ServletEnvironment servlets;
+
+    @Mock
+    private LifecycleEnvironment lifecycle ;
+
+    @Mock
+    private HealthCheckRegistry healthChecks ;
 
     private HelloAppConfiguration configuration;
 
@@ -57,8 +76,17 @@ public class SpringBundleTest {
         configuration = new HelloAppConfiguration();
         configuration.setHello(hello);
 
-        when(environment.getObjectMapperFactory()).thenReturn(objectMapperFactory);
-        when(objectMapperFactory.build()).thenReturn(new ObjectMapper());
+        when(environment.getObjectMapper()).thenReturn(Jackson.newObjectMapper());
+
+        when(environment.jersey()).thenReturn(jersey);
+
+        when(environment.admin()).thenReturn(admin);
+
+        when(environment.servlets()).thenReturn(servlets);
+
+        when(environment.lifecycle()).thenReturn(lifecycle);
+
+        when(environment.healthChecks()).thenReturn(healthChecks);
     }
 
     @Test
@@ -68,7 +96,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment).addResource(resource.capture());
+        verify(jersey).register(resource.capture());
         assertThat(resource.getValue(), is(HelloResource.class));
     }
 
@@ -79,7 +107,10 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<? extends HealthCheck> healthCheck = ArgumentCaptor.forClass(HealthCheck.class);
-        verify(environment).addHealthCheck(healthCheck.capture());
+        ArgumentCaptor<String> healthCheckName = ArgumentCaptor.forClass(String.class);
+        verify(healthChecks).register(healthCheckName.capture(), healthCheck.capture());
+
+        assertThat(healthCheckName.getValue(), is("helloHealthCheck")); // is the bean name
         assertThat(healthCheck.getValue(), is(HelloHealthCheck.class));
     }
 
@@ -90,7 +121,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<? extends Task> task = ArgumentCaptor.forClass(Task.class);
-        verify(environment).addTask(task.capture());
+        verify(admin).addTask(task.capture());
         assertThat(task.getValue(), is(HelloTask.class));
     }
 
@@ -101,7 +132,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<? extends ServerLifecycleListener> listener = ArgumentCaptor.forClass(ServerLifecycleListener.class);
-        verify(environment).addServerLifecycleListener(listener.capture());
+        verify(servlets).addServletListeners(listener.capture());
         assertThat(listener.getValue(), is(HelloServerLifecycleListener.class));
     }
 
@@ -112,10 +143,10 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment).addResource(resource.capture());
+        verify(jersey).register(resource.capture());
 
         HelloResource r = resource.getValue();
-        assertThat(r.getPort(), is(8080)); // Defaut port
+        assertThat(r.getPort(), is(8080)); // Default port
     }
 
     @Test
@@ -135,7 +166,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment).addResource(resource.capture());
+        verify(jersey).register(resource.capture());
 
         HelloResource r = resource.getValue();
         final HelloService helloService = r.getHelloService();
