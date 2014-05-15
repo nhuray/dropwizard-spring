@@ -1,16 +1,13 @@
 package hello.health;
 
-import com.yammer.metrics.core.HealthCheck;
+
+import com.codahale.metrics.health.HealthCheck;
 
 public class HelloHealthCheck extends HealthCheck {
 
-	public HelloHealthCheck() {
-		super("hello-health");
-	}
-	
-	@Override
-	protected Result check() throws Exception {
-		return Result.healthy();
-	}
+    @Override
+    protected Result check() throws Exception {
+        return HealthCheck.Result.healthy();
+    }
 
 }

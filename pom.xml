@@ -7,7 +7,7 @@
     </parent>
     <groupId>com.github.nhuray</groupId>
     <artifactId>dropwizard-spring</artifactId>
-    <version>0.3.1-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
@@ -57,7 +57,7 @@
     </distributionManagement>
 
     <properties>
-        <dropwizard.version>0.6.2</dropwizard.version>
+        <dropwizard.version>0.7.0</dropwizard.version>
         <spring.version>3.1.4.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -66,7 +66,7 @@
 
         <!-- Compile Dependencies -->
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>
             <optional>true</optional>
