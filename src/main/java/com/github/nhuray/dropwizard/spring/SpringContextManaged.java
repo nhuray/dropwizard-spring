@@ -1,8 +1,8 @@
 package com.github.nhuray.dropwizard.spring;
 
+import io.dropwizard.lifecycle.Managed;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.yammer.dropwizard.lifecycle.Managed;
 
 public class SpringContextManaged implements Managed {
   private final ConfigurableApplicationContext context;

@@ -7,7 +7,7 @@
     </parent>
     <groupId>com.github.nhuray</groupId>
     <artifactId>dropwizard-spring</artifactId>
-    <version>0.3.1-SNAPSHOT</version>
+    <version>0.3.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
@@ -57,19 +57,29 @@
     </distributionManagement>
 
     <properties>
-        <dropwizard.version>0.6.2</dropwizard.version>
-        <spring.version>3.1.4.RELEASE</spring.version>
+        <dropwizard.version>0.7.0</dropwizard.version>
+        <spring.version>4.0.5.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <guava.version>17.0</guava.version>
     </properties>
 
     <dependencies>
 
         <!-- Compile Dependencies -->
         <dependency>
-            <groupId>com.yammer.dropwizard</groupId>
+            <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>
-            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-lifecycle</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-servlets</artifactId>
+            <version>${dropwizard.version}</version>
         </dependency>
 
         <dependency>
@@ -77,6 +87,12 @@
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -89,7 +105,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
+            <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
         <!-- CGLIB, only required and used for @Configuration usage -->
