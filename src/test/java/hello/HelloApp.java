@@ -2,17 +2,15 @@ package hello;
 
 
 import com.github.nhuray.dropwizard.spring.SpringBundle;
-import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
 import hello.config.HelloAppConfiguration;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class HelloApp extends Service<HelloAppConfiguration> {
+public class HelloApp extends Application<HelloAppConfiguration> {
 
     private static final String CONFIGURATION_FILE = "src/test/resources/hello/hello.yml";
 
@@ -27,7 +25,7 @@ public class HelloApp extends Service<HelloAppConfiguration> {
 
     @Override
     public void run(HelloAppConfiguration configuration, Environment environment) throws Exception {
-       // doing nothing
+        // doing nothing
     }
 
 

@@ -1,7 +1,7 @@
 package com.github.nhuray.dropwizard.spring.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.dropwizard.config.Configuration;
+import io.dropwizard.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
