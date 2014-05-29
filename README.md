@@ -17,11 +17,12 @@ This project provide a simple method for integrating Spring with Dropwizard.
 Versions
 ------------
 
-The current version of the project is **0.2**.
+The current version of the project is **0.4.0-SNAPSHOT**.
 
 | dropwizard-spring  | Dropwizard   | Spring        |
 |:------------------:|:------------:|:-------------:|
-| master (0.3.1)     | 0.6.2        | 3.1.4.RELEASE |
+| master (0.4.0-SNAPSHOT) | 0.7.0        | 3.1.4.RELEASE |
+| 0.3.1              | 0.6.2        | 3.1.4.RELEASE |
 | 0.2                | 0.6.0        | 3.1.3.RELEASE |
 | 0.1                | 0.5.1        | 3.1.1.RELEASE |
 
@@ -36,7 +37,7 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 <dependency>
      <groupId>com.github.nhuray</groupId>
      <artifactId>dropwizard-spring</artifactId>
-     <version>0.2</version>
+     <version>0.4.0-SNAPSHOT</version>
 </dependency>
 ```
 
