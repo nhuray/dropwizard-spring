@@ -3,7 +3,7 @@ package com.github.nhuray.dropwizard.spring.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yammer.dropwizard.config.Configuration;
+import io.dropwizard.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -36,8 +36,9 @@ public class ConfigurationPlaceholderConfigurerTest {
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
                 rootBeanDefinition(ConfigurationTestBean.class)
-                        .addPropertyValue("connectorType", "${http.connectorType}")
-                        .getBeanDefinition());
+                        .addPropertyValue("maxThreads", "${server.maxThreads}")
+                        .getBeanDefinition()
+        );
         placeholder.setObjectMapper(new ObjectMapper());
 
         // When
@@ -45,7 +46,7 @@ public class ConfigurationPlaceholderConfigurerTest {
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
-        assertThat(bean.getConnectorType(), equalTo("blocking"));
+        assertThat(bean.getMaxThreads(), equalTo(1024));
     }
 
     @Test
@@ -58,9 +59,10 @@ public class ConfigurationPlaceholderConfigurerTest {
         DefaultListableBeanFactory bf = new DefaultListableBeanFactory();
         bf.registerBeanDefinition("testBean",
                 rootBeanDefinition(ConfigurationTestBean.class)
-                        .addPropertyValue("connectorType", "@<http.connectorType>")
+                        .addPropertyValue("maxThreads", "@<server.maxThreads>")
                         .addPropertyValue("rootPath", "${key2}")
-                        .getBeanDefinition());
+                        .getBeanDefinition()
+        );
         placeholder.setObjectMapper(new ObjectMapper());
 
         // When
@@ -68,7 +70,7 @@ public class ConfigurationPlaceholderConfigurerTest {
 
         // Then
         ConfigurationTestBean bean = bf.getBean(ConfigurationTestBean.class);
-        assertThat(bean.getConnectorType(), is("blocking"));
+        assertThat(bean.getMaxThreads(), is(1024));
         assertThat(bean.getRootPath(), is("${key2}"));
     }
 
@@ -82,7 +84,8 @@ public class ConfigurationPlaceholderConfigurerTest {
         bf.registerBeanDefinition("testBean",
                 rootBeanDefinition(ConfigurationTestBean.class)
                         .addPropertyValue("connectorType", "${nullProperty}")
-                        .getBeanDefinition());
+                        .getBeanDefinition()
+        );
         placeholder.setObjectMapper(new ObjectMapper());
 
         // When
@@ -97,6 +100,4 @@ public class ConfigurationPlaceholderConfigurerTest {
         @JsonProperty
         private String nullProperty = "nullField";
     }
-
-
 }
