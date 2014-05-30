@@ -1,7 +1,10 @@
 package com.github.nhuray.dropwizard.spring.config;
 
+import com.codahale.metrics.MetricFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.Configuration;
+import io.dropwizard.metrics.BaseReporterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -67,7 +70,6 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         try {
             Properties props = new Properties();
-
             // Load properties
             loadProperties(props);
 
@@ -159,6 +161,7 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
 
     public void setObjectMapper(final ObjectMapper objectMapper) {
       this.objectMapper = objectMapper;
+      this.objectMapper.addMixInAnnotations(BaseReporterFactory.class, BaseReporterFactoryMixin.class);
       this.propertiesPersister = new JsonPropertiesPersister(objectMapper);
     }
 
@@ -192,6 +195,11 @@ public class ConfigurationPlaceholderConfigurer implements BeanFactoryPostProces
         public String resolvePlaceholder(String placeholderName) {
             return props.getProperty(placeholderName);
         }
+    }
+
+    private interface BaseReporterFactoryMixin {
+        @JsonIgnore
+        MetricFilter getFilter();
     }
 
     // ~ Copied and adapted from {@link PlaceholderConfigurerSupport} -----------------------------------------------------------
