@@ -4,6 +4,8 @@ import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import com.google.common.base.Preconditions;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -111,6 +113,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         registerHealthChecks(environment, context);
         registerInjectableProviders(environment, context);
         registerProviders(environment, context);
+        registerContainerResponseFilters(environment, context);
         registerResources(environment, context);
         environment.lifecycle().manage(new SpringContextManaged(context));
     }
@@ -261,6 +264,14 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         }
     }
 
+    private void registerContainerResponseFilters(Environment environment, ConfigurableApplicationContext context) {
+        final Map<String, ContainerResponseFilter> beansOfType = context.getBeansOfType(ContainerResponseFilter.class);
+        for (String beanName : beansOfType.keySet()) {
+            ContainerResponseFilter responseFilter = beansOfType.get(beanName);
+            environment.jersey().property(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, responseFilter);
+            LOG.info("Registering ContainerResponseFilter: " + responseFilter.getClass().getName());
+        }
+    }
 
     /**
      * Register resources annotated with {@link Path} in Dropwizard {@link Environment} from Spring application context.

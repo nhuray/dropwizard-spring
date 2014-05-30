@@ -73,6 +73,13 @@
         </dependency>
 
         <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-metrics</artifactId>
+            <version>${dropwizard.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>

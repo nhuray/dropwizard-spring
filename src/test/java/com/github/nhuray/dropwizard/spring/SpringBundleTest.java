@@ -3,8 +3,11 @@ package com.github.nhuray.dropwizard.spring;
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
 import hello.config.HelloAppConfiguration;
 import hello.config.HelloConfiguration;
+import hello.filter.HelloResponseFilter;
 import hello.health.HelloHealthCheck;
 import hello.resources.HelloResource;
 import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
@@ -101,6 +104,16 @@ public class SpringBundleTest {
         assertThat(healthCheck.getValue(), is(HelloHealthCheck.class));
     }
 
+    @Test
+    public void registerContainerResponseFilters() throws Exception {
+        // When
+        bundle.run(configuration, environment);
+
+        // Then
+        ArgumentCaptor<? extends ContainerResponseFilter> responseFilter = ArgumentCaptor.forClass(ContainerResponseFilter.class);
+        verify(environment.jersey()).property(eq(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS), responseFilter.capture());
+        assertThat(responseFilter.getValue(), is(ContainerResponseFilter.class));
+    }
     @Test
     public void registerTasks() throws Exception {
         // When
