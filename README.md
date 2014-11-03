@@ -1,6 +1,8 @@
 Dropwizard/Spring
 ===================================
 
+[ ![Codeship Status for nhuray/dropwizard-spring](https://www.codeship.io/projects/aaabb970-44fc-0132-2a3e-3e77b90e182a/status)](https://www.codeship.io/projects/44910)
+
 Welcome to the Dropwizard/Spring project
 
 
