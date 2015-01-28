@@ -65,7 +65,7 @@ public class SpringBundleTest {
     public void setup() {
         context = new AnnotationConfigApplicationContext();
         context.scan("hello");
-        bundle = new SpringBundle(context, true, true, true);
+        bundle = new SpringBundle(context, true, true, true, true);
 
         MockitoAnnotations.initMocks(this);
 
@@ -182,21 +182,27 @@ public class SpringBundleTest {
     public void unableToRegisterConfigurationIfSpringContextIsActive() throws Exception {
         // When
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
-        bundle = new SpringBundle(context, true, false, false);
+        bundle = new SpringBundle(context, true, false, false, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unableToRegisterPlaceholderIfSpringContextIsActive() throws Exception {
         // When
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
-        bundle = new SpringBundle(context, false, false, true);
+        bundle = new SpringBundle(context, false, false, true, false);
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void unableToRegisterEnvironmentIfSpringContextIsActive() throws Exception {
         // When
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
-        bundle = new SpringBundle(context, false, true, false);
+        bundle = new SpringBundle(context, false, true, false, false);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unableToRegisterObjectMapperIfSpringContextIsActive() throws Exception {
+        // When
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("test"); // active context
+        bundle = new SpringBundle(context, false, false, false, true);
     }
 }
