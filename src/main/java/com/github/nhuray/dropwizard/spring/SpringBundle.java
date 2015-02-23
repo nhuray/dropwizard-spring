@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
@@ -37,6 +38,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
     private ConfigurableApplicationContext context;
     private ConfigurationPlaceholderConfigurer placeholderConfigurer;
+    private Class<?> springConfigurationClass = null;
     private boolean registerConfiguration;
     private boolean registerEnvironment;
 
@@ -69,6 +71,36 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         if (registerPlaceholder) this.placeholderConfigurer = new ConfigurationPlaceholderConfigurer();
     }
 
+    /** 
+     * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
+     * <p/>
+     *
+     * @param context                  the application context to load
+     * @param springConfigurationClass an annotated spring configuration class to register after configuration, environment
+     *                                 and placeholderConfigurer got injected into the context.
+     * @param registerConfiguration    register Dropwizard configuration as a Spring Bean.
+     * @param registerEnvironment      register Dropwizard environment as a Spring Bean.
+     * @param registerPlaceholder      resolve Dropwizard configuration as properties.
+     */
+    public SpringBundle(final AnnotationConfigApplicationContext context, final Class<?> springConfigurationClass,
+            final boolean registerConfiguration, final boolean registerEnvironment, final boolean registerPlaceholder)
+    {
+        Preconditions.checkNotNull(springConfigurationClass, "spring configuration class is required");
+
+        if (registerConfiguration || registerEnvironment || registerPlaceholder) {
+            Preconditions.checkArgument(!context.isActive(),
+                    "Context must be not active in order to register configuration, environment or placeholder");
+        }
+        this.context = context;
+        this.registerConfiguration = registerConfiguration;
+        this.registerEnvironment = registerEnvironment;
+        this.springConfigurationClass = springConfigurationClass;
+        if (registerPlaceholder) {
+            this.placeholderConfigurer = new ConfigurationPlaceholderConfigurer();
+        }
+     }
+
+
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
      * <p/>
@@ -99,6 +131,12 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
         // Register a placeholder to resolve Dropwizard Configuration as properties.
         if (placeholderConfigurer != null) registerPlaceholder(environment, configuration, context);
+
+        // After configuration, environment and placeholder got configured,
+        // register the spring configuration that instantiate beans that need them
+        if (springConfigurationClass != null && context instanceof AnnotationConfigApplicationContext) {
+            ((AnnotationConfigApplicationContext) context).register(springConfigurationClass);
+        }
 
         // Refresh context if is not active
         if (!context.isActive()) context.refresh();
