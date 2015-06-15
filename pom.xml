@@ -57,10 +57,10 @@
     </distributionManagement>
 
     <properties>
-        <dropwizard.version>0.7.0</dropwizard.version>
-        <spring.version>4.0.5.RELEASE</spring.version>
+        <dropwizard.version>0.8.1</dropwizard.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <guava.version>17.0</guava.version>
+        <guava.version>18.0</guava.version>
     </properties>
 
     <dependencies>
