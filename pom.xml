@@ -1,32 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-    <groupId>com.github.nhuray</groupId>
+
+    <groupId>com.github.raduciumag</groupId>
     <artifactId>dropwizard-spring</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <version>0.3.5-SNAPSHOT</version>
+
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
-
-    <scm>
-        <connection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</connection>
-        <url>git@github.com:41quickbuild/dropwizard-spring</url>
-        <developerConnection>scm:git:git@github.com:41quickbuild/dropwizard-spring.git</developerConnection>
-    </scm>
-
-    <issueManagement>
-      <system>JIRA</system>
-      <url>http://jira</url>
-    </issueManagement>
-
-    <ciManagement>
-      <system>Bamboo</system>
-      <url>http://bamboo/bamboo</url>
-    </ciManagement>
 
     <licenses>
         <license>
@@ -43,39 +31,36 @@
             <url>https://github.com/nhuray/</url>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>raduciumag</id>
+            <name>Radu Ciumag</name>
+            <url>https://github.com/RaduCiumag</url>
+            <timezone>+2</timezone>
+        </developer>
     </developers>
 
-    <distributionManagement>
-      <repository>
-        <id>nexus</id>
-        <url>http://nexus.the41.internal/content/repositories/releases/</url>
-      </repository>
-      <snapshotRepository>
-        <id>nexus</id>
-        <url>http://nexus.the41.internal/content/repositories/snapshots/</url>
-      </snapshotRepository>
-    </distributionManagement>
-
     <properties>
-        <dropwizard.version>0.7.0</dropwizard.version>
-        <spring.version>4.0.5.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <guava.version>17.0</guava.version>
+
+        <dropwizard.version>0.8.1</dropwizard.version>
+        <guava.version>18.0</guava.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
     </properties>
 
     <dependencies>
-
         <!-- Compile Dependencies -->
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-lifecycle</artifactId>
             <version>${dropwizard.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-servlets</artifactId>
@@ -102,12 +87,14 @@
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
+
         <!-- CGLIB, only required and used for @Configuration usage -->
         <dependency>
             <groupId>cglib</groupId>
@@ -115,7 +102,6 @@
             <version>2.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -127,7 +113,6 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin>
