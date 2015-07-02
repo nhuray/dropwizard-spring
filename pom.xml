@@ -11,7 +11,7 @@
     <groupId>com.github.raduciumag</groupId>
     <artifactId>dropwizard-spring</artifactId>
     <packaging>jar</packaging>
-    <version>0.3.4-RELEASE</version>
+    <version>0.3.5-SNAPSHOT</version>
 
     <name>Dropwizard/Spring integration</name>
     <description>Dropwizard/Spring integration</description>
