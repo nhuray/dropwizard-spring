@@ -46,7 +46,7 @@ To install Dropwizard/Spring you just have to add this Maven dependency in your 
 To install a newer release, download the jar and added it to your local maven repository. Execute this command in the same folder as the jar:
 
 ```
-mvn install:install-file -Dfile=dropwizard-spring-0.3.4.jar -DgroupId=com.github.raduciumag -DartifactId=dropwizard-spring -Dversion=0.3.4-RELEASE -Dpackaging=jar
+mvn install:install-file -Dfile=dropwizard-spring-0.3.4-RELEASE.jar -DgroupId=com.github.raduciumag -DartifactId=dropwizard-spring -Dversion=0.3.4-RELEASE -Dpackaging=jar
 ```
 
 Usage
