@@ -27,6 +27,8 @@ The latest version of the project available on Maven repository is **0.2**.
 | 0.2                | 0.6.0        | 3.1.3.RELEASE |
 | 0.1                | 0.5.1        | 3.1.1.RELEASE |
 
+The latest available release is **0.3.4**.
+
 
 Installation
 ------------
