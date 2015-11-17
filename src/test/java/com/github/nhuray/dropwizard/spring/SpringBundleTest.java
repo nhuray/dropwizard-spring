@@ -1,19 +1,20 @@
 package com.github.nhuray.dropwizard.spring;
 
+import javax.ws.rs.container.ContainerResponseFilter;
+
 import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 import hello.config.HelloAppConfiguration;
 import hello.config.HelloConfiguration;
-import hello.filter.HelloResponseFilter;
+import hello.config.HelloInjectionResolver;
 import hello.health.HelloHealthCheck;
 import hello.resources.HelloResource;
 import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
 import hello.service.HelloService;
 import hello.tasks.HelloTask;
 import io.dropwizard.Configuration;
+import io.dropwizard.jersey.DropwizardResourceConfig;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
@@ -33,6 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 public class SpringBundleTest {
@@ -51,6 +53,9 @@ public class SpringBundleTest {
 
     @Mock
     private JerseyEnvironment jerseyEnvironment;
+
+    @Mock
+    private DropwizardResourceConfig resourceConfig;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -80,6 +85,8 @@ public class SpringBundleTest {
         when(environment.admin()).thenReturn(adminEnvironment);
         when(environment.healthChecks()).thenReturn(healthCheckRegistry);
         when(environment.jersey()).thenReturn(jerseyEnvironment);
+
+        when(jerseyEnvironment.getResourceConfig()).thenReturn(resourceConfig);
     }
 
     @Test
@@ -89,7 +96,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey()).register(resource.capture());
+        verify(environment.jersey(), times(2)).register(resource.capture());
         assertThat(resource.getValue(), is(HelloResource.class));
     }
 
@@ -111,9 +118,21 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<? extends ContainerResponseFilter> responseFilter = ArgumentCaptor.forClass(ContainerResponseFilter.class);
-        verify(environment.jersey()).property(eq(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS), responseFilter.capture());
+        verify(environment.jersey().getResourceConfig()).register(responseFilter.capture());
         assertThat(responseFilter.getValue(), is(ContainerResponseFilter.class));
     }
+
+    @Test
+    public void registerHelloInjectionResolver() throws Exception {
+        // When
+        bundle.run(configuration, environment);
+
+        // Then
+        ArgumentCaptor<HelloInjectionResolver> resource = ArgumentCaptor.forClass(HelloInjectionResolver.class);
+        verify(environment.jersey(), times(2)).register(resource.capture());
+        assertThat(resource.getAllValues().get(0), is(HelloInjectionResolver.class));
+    }
+
     @Test
     public void registerTasks() throws Exception {
         // When
@@ -143,7 +162,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey()).register(resource.capture());
+        verify(environment.jersey(), times(2)).register(resource.capture());
 
         HelloResource r = resource.getValue();
         assertThat(r.getPort(), is(8080)); // Defaut port
@@ -166,7 +185,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey()).register(resource.capture());
+        verify(environment.jersey(), times(2)).register(resource.capture());
 
         HelloResource r = resource.getValue();
         final HelloService helloService = r.getHelloService();

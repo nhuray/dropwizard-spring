@@ -1,8 +1,8 @@
 package hello.filter;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
 public class HelloResponseFilter implements ContainerResponseFilter {
 
@@ -11,7 +11,7 @@ public class HelloResponseFilter implements ContainerResponseFilter {
     }
 
     @Override
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        return null;
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) {
+
     }
 }

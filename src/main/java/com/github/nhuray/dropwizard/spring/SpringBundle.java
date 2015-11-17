@@ -1,12 +1,23 @@
 package com.github.nhuray.dropwizard.spring;
 
+import java.util.Map;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.Provider;
+
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.glassfish.hk2.api.InjectionResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+
 import com.codahale.metrics.health.HealthCheck;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nhuray.dropwizard.spring.config.ConfigurationPlaceholderConfigurer;
 import com.google.common.base.Preconditions;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.inject.InjectableProvider;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.lifecycle.Managed;
@@ -14,15 +25,6 @@ import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import org.eclipse.jetty.util.component.LifeCycle;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
-import java.util.Map;
 
 /**
  * A bundle which load Spring Application context to automatically initialize Dropwizard {@link Environment}
@@ -119,7 +121,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         registerServerLifecycleListeners(environment, context);
         registerTasks(environment, context);
         registerHealthChecks(environment, context);
-        registerInjectableProviders(environment, context);
+        registerInjectionResolvers(environment, context);
         registerProviders(environment, context);
         registerContainerResponseFilters(environment, context);
         registerResources(environment, context);
@@ -246,13 +248,13 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
      * @param environment the Dropwizard environment
      * @param context     the Spring application context
      */
-    private void registerInjectableProviders(Environment environment, ConfigurableApplicationContext context) {
-        final Map<String, InjectableProvider> beansOfType = context.getBeansOfType(InjectableProvider.class);
+    private void registerInjectionResolvers(Environment environment, ConfigurableApplicationContext context) {
+        final Map<String, InjectionResolver> beansOfType = context.getBeansOfType(InjectionResolver.class);
         for (String beanName : beansOfType.keySet()) {
-            // Add injectableProvider to Dropwizard environment
-            InjectableProvider injectableProvider = beansOfType.get(beanName);
-            environment.jersey().register(injectableProvider);
-            LOG.info("Registering injectable provider: " + injectableProvider.getClass().getName());
+            // Add InjectionResolver to Dropwizard environment
+            InjectionResolver resolver = beansOfType.get(beanName);
+            environment.jersey().register(resolver);
+            LOG.info("Registering injection resolver: " + resolver.getClass().getName());
         }
     }
 
@@ -276,7 +278,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         final Map<String, ContainerResponseFilter> beansOfType = context.getBeansOfType(ContainerResponseFilter.class);
         for (String beanName : beansOfType.keySet()) {
             ContainerResponseFilter responseFilter = beansOfType.get(beanName);
-            environment.jersey().property(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, responseFilter);
+            environment.jersey().getResourceConfig().register(responseFilter);
             LOG.info("Registering ContainerResponseFilter: " + responseFilter.getClass().getName());
         }
     }
