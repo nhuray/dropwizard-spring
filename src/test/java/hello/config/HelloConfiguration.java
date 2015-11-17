@@ -1,7 +1,8 @@
 package hello.config;
 
+import javax.ws.rs.container.ContainerResponseFilter;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 import hello.filter.HelloResponseFilter;
 import hello.health.HelloHealthCheck;
 import hello.server_lifecycle_listeners.HelloServerLifecycleListener;
@@ -35,6 +36,10 @@ public class HelloConfiguration {
 
     @Bean
     public ContainerResponseFilter containerResponseFilter() { return new HelloResponseFilter(); }
+
+    @Bean
+    public HelloInjectionResolver helloInjectionResolver() { return new HelloInjectionResolver(); }
+
     @Bean
     public HelloServerLifecycleListener helloServerLifecycleListener() {
       return new HelloServerLifecycleListener();
