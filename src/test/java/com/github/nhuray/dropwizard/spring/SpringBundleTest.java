@@ -6,6 +6,7 @@ import com.codahale.metrics.health.HealthCheck;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.config.HelloAppConfiguration;
+import hello.config.HelloBinder;
 import hello.config.HelloConfiguration;
 import hello.config.HelloInjectionResolver;
 import hello.health.HelloHealthCheck;
@@ -96,7 +97,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey(), times(2)).register(resource.capture());
+        verify(environment.jersey()).register(resource.capture());
         assertThat(resource.getValue(), is(HelloResource.class));
     }
 
@@ -118,7 +119,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<? extends ContainerResponseFilter> responseFilter = ArgumentCaptor.forClass(ContainerResponseFilter.class);
-        verify(environment.jersey().getResourceConfig()).register(responseFilter.capture());
+        verify(environment.jersey().getResourceConfig(), times(2)).register(responseFilter.capture());
         assertThat(responseFilter.getValue(), is(ContainerResponseFilter.class));
     }
 
@@ -128,9 +129,9 @@ public class SpringBundleTest {
         bundle.run(configuration, environment);
 
         // Then
-        ArgumentCaptor<HelloInjectionResolver> resource = ArgumentCaptor.forClass(HelloInjectionResolver.class);
-        verify(environment.jersey(), times(2)).register(resource.capture());
-        assertThat(resource.getAllValues().get(0), is(HelloInjectionResolver.class));
+        ArgumentCaptor<HelloBinder> resource = ArgumentCaptor.forClass(HelloBinder.class);
+        verify(environment.jersey().getResourceConfig(), times(2)).register(resource.capture());
+        assertThat(resource.getAllValues().get(0), is(HelloBinder.class));
     }
 
     @Test
@@ -162,7 +163,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey(), times(2)).register(resource.capture());
+        verify(environment.jersey()).register(resource.capture());
 
         HelloResource r = resource.getValue();
         assertThat(r.getPort(), is(8080)); // Defaut port
@@ -185,7 +186,7 @@ public class SpringBundleTest {
 
         // Then
         ArgumentCaptor<HelloResource> resource = ArgumentCaptor.forClass(HelloResource.class);
-        verify(environment.jersey(), times(2)).register(resource.capture());
+        verify(environment.jersey()).register(resource.capture());
 
         HelloResource r = resource.getValue();
         final HelloService helloService = r.getHelloService();
