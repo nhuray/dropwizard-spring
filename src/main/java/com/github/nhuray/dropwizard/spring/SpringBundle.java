@@ -2,12 +2,15 @@ package com.github.nhuray.dropwizard.spring;
 
 import java.util.Map;
 
+import javax.inject.Singleton;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.glassfish.hk2.api.InjectionResolver;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -121,7 +124,7 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
         registerServerLifecycleListeners(environment, context);
         registerTasks(environment, context);
         registerHealthChecks(environment, context);
-        registerInjectionResolvers(environment, context);
+        registerInjectionResolverBinders(environment, context);
         registerProviders(environment, context);
         registerContainerResponseFilters(environment, context);
         registerResources(environment, context);
@@ -243,18 +246,18 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
 
     /**
-     * Register {@link InjectableProvider}s in Dropwizard {@link Environment} from Spring application context.
+     * Register {@link InjectionResolver}s in Dropwizard {@link Environment} from Spring application context.
      *
      * @param environment the Dropwizard environment
      * @param context     the Spring application context
      */
-    private void registerInjectionResolvers(Environment environment, ConfigurableApplicationContext context) {
-        final Map<String, InjectionResolver> beansOfType = context.getBeansOfType(InjectionResolver.class);
+    private void registerInjectionResolverBinders(Environment environment, ConfigurableApplicationContext context) {
+        final Map<String, AbstractBinder> beansOfType = context.getBeansOfType(AbstractBinder.class);
         for (String beanName : beansOfType.keySet()) {
-            // Add InjectionResolver to Dropwizard environment
-            InjectionResolver resolver = beansOfType.get(beanName);
-            environment.jersey().register(resolver);
-            LOG.info("Registering injection resolver: " + resolver.getClass().getName());
+            // Add InjectionResolver to Dropwizard environment with Binder
+            final AbstractBinder binder = beansOfType.get(beanName);
+            environment.jersey().getResourceConfig().register(binder);
+            LOG.info("Registering injection resolver binder: " + binder.getClass().getName());
         }
     }
 

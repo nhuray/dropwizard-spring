@@ -38,7 +38,7 @@ public class HelloConfiguration {
     public ContainerResponseFilter containerResponseFilter() { return new HelloResponseFilter(); }
 
     @Bean
-    public HelloInjectionResolver helloInjectionResolver() { return new HelloInjectionResolver(); }
+    public HelloBinder helloBinder() { return new HelloBinder(); }
 
     @Bean
     public HelloServerLifecycleListener helloServerLifecycleListener() {

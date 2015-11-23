@@ -4,9 +4,9 @@ import org.glassfish.hk2.api.Injectee;
 import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.ServiceHandle;
 
-public class HelloInjectionResolver implements InjectionResolver<String> {
+public class HelloInjectionResolver implements InjectionResolver<Object> {
 
-  private InjectionResolver<String> systemResolver;
+  private InjectionResolver<Object> resolver;
 
   @Override
   public boolean isConstructorParameterIndicator() {
