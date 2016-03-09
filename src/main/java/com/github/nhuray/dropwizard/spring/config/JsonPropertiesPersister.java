@@ -12,7 +12,7 @@ import java.util.Properties;
 
 /**
  * {@link org.springframework.util.PropertiesPersister} that reads from a JSON source.
- * <p/>
+ *
  * This code was inspired from  <a href="https://gist.com.com/2051955">Dave Syer YamlPropertiesFactoryBean</a>.
  *
  * @author Dave Syer

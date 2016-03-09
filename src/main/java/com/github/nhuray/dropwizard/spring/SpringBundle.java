@@ -50,7 +50,6 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
-     * <p/>
      *
      * @param context the application context to load
      */
@@ -60,7 +59,6 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
-     * <p/>
      *
      * @param context               the application context to load
      * @param registerConfiguration register Dropwizard configuration as a Spring Bean.
@@ -81,7 +79,6 @@ public class SpringBundle<T extends Configuration> implements ConfiguredBundle<T
 
     /**
      * Creates a new SpringBundle to automatically initialize Dropwizard {@link Environment}
-     * <p/>
      *
      * @param context               the application context to load
      * @param registerConfiguration register Dropwizard configuration as a Spring Bean.
