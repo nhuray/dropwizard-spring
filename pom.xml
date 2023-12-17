@@ -48,11 +48,11 @@
     <distributionManagement>
       <repository>
         <id>nexus</id>
-        <url>http://nexus.the41.internal/content/repositories/releases/</url>
+        <url>https://nexus.the41.internal/content/repositories/releases/</url>
       </repository>
       <snapshotRepository>
         <id>nexus</id>
-        <url>http://nexus.the41.internal/content/repositories/snapshots/</url>
+        <url>https://nexus.the41.internal/content/repositories/snapshots/</url>
       </snapshotRepository>
     </distributionManagement>
 
